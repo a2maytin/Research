@@ -85,12 +85,12 @@ ii0=1; % counter for data saving
 % ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 for tt1=dt_out:dt_out:t_fin % "save cycle", save data at each step
  
-  % Get pools of random steps, i.e., Brownian dynamics steps
+  % Get pool of random steps, i.e., Brownian dynamics steps
   % Used the formula from https://www.nature.com/articles/nmeth.2367
-  Dpool=sqrt(2*D_bound*dt)*normrnd(0,1,[1,3*totR*ceil(dt_out/dt)]);  
+  Dpool=sqrt(2*D*dt)*normrnd(0,1,[1,3*totR*ceil(dt_out/dt)]);  
  
-  % counters for drawing numbers from the pools 
-  ddB=0; % counter for RNaseE diffusion steps
+  % counters for drawing numbers from the pool
+  ddB=0; 
   
   % ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   for tt2=dt:dt:dt_out % "silent" cycle, move without saving data
@@ -100,14 +100,14 @@ for tt1=dt_out:dt_out:t_fin % "save cycle", save data at each step
     % ~~~~~ Make BD moves    
  
     % - bound RNaseE moves
-       xB_new=x_R+Dpool(1,ddB+1:ddB+d_indx);
-       yB_new=y_R+Dpool(1,ddB+d_indx+1:ddB+2*d_indx);
-       zB_new=z_R+Dpool(1,ddB+2*d_indx+1:ddB+3*d_indx);
+       xB_new=x_R+Dpool(1,ddB+1:ddB+totR);
+       yB_new=y_R+Dpool(1,ddB+totR+1:ddB+2*totR);
+       zB_new=z_R+Dpool(1,ddB+2*totR+1:ddB+3*totR);
        % apply reflecting boundaries, if necessary,
        [x_R,y_R,z_R] = apply_boundaries(xB_new,yB_new,zB_new);  
      
      % shift the counter 
-     ddB=ddB+3*d_indx;
+     ddB=ddB+3*totR;
 
            
   end % "silent" cycle
