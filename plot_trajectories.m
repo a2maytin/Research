@@ -6,7 +6,7 @@ params.dt_out=1;
 params.t_fin=10;
 params.l0=2.3;
 params.w0=0.5000;
-params.totR=5;
+params.totR=2;
 params.D=0.0100;
 
 %Simulate trajectories
@@ -18,10 +18,12 @@ y=rne(:,2:3:end);
 z=rne(:,3:3:end);
 
 %Plot 2D trajectories
-%plot(x,y)
+plot(x,y)
+%hold on
+%plot(mean(x),mean(y),'o')
 
 %Plot 3D trajectories
-plot3(x,y,z)
+%plot3(x,y,z)
 
 grid on
 daspect([1 1 1])

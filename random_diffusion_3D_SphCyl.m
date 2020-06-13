@@ -14,7 +14,7 @@ function [rne,tt,params] = random_diffusion_3D_SphCyl(params)
 %     params.dt_out - data output time step
 %     params.t_fin - end time of simulation
 %   Full list of parameters can be found in a nested function "change_parameters" below
-%   Defaults values will be used for parameters value/fields not provided in input
+%   Default values will be used for parameters value/fields not provided in input
 %
 % OUTPUT:
 %   rne - coordinates of RNaseE vs time, i-th row is a snap shot of coordinates of all RNaseE (X1,Y1, Z1, X2,Y2, Z2 ...) at a given time,(i-1)*dt_out 
@@ -92,10 +92,16 @@ for tt1=dt_out:dt_out:t_fin % "save cycle", save data at each step
   % counters for drawing numbers from the pool
   ddB=0; 
   
+  % arrays to store the microtrajectories
+  xB = [];
+  yB = [];
+  zB = [];
+  
   % ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   for tt2=dt:dt:dt_out % "silent" cycle, move without saving data
       
     tt=tt1+tt2; % current time
+
           
     % ~~~~~ Make BD moves    
  
@@ -115,6 +121,7 @@ for tt1=dt_out:dt_out:t_fin % "save cycle", save data at each step
 
    % Current Data collection
    ii0=ii0+1;
+   % position saved as the centroid of microtrajectories to mimic analysis procedure of experimental images
    rne(ii0,1:3:end)=x_R;
    rne(ii0,2:3:end)=y_R;
    rne(ii0,3:3:end)=z_R;
@@ -156,6 +163,8 @@ function params_out = change_parameters(params_in)
  params0.totR=90;  % number of RNaseE
 
  params0.D=0.01; % diffusion coefficient
+ 
+ params0.sigma=0.01; % dynamic localization error
   
  params0.dim=3; % Dimension of simulations;
  params0.script=script; %'diffusing_RNaseE';
