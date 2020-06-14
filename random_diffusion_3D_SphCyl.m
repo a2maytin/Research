@@ -17,7 +17,7 @@ function [rne,tt,params] = random_diffusion_3D_SphCyl(params)
 %   Default values will be used for parameters value/fields not provided in input
 %
 % OUTPUT:
-%   rne - coordinates of RNaseE vs time, i-th row is a snap shot of coordinates of all RNaseE (X1,Y1, Z1, X2,Y2, Z2 ...) at a given time,(i-1)*dt_out 
+%   rne - measured coordinates of RNaseE vs time, i-th row is a snap shot of coordinates of all RNaseE (X1,Y1, Z1, X2,Y2, Z2 ...) at a given time,(i-1)*dt_out 
 %   tt - simulation time
 %   params - parameters used for simulation, also contain versio/date info
 %   
@@ -46,6 +46,9 @@ w0=params.w0;  % cell width
  % free and bound RNaseE-related parameters
 totR=params.totR;  % number of RNaseE
 D=params.D; % Diffusion coefficient
+
+% microscope parameters
+sigma=params.sigma; % dynamic localization error
 
 
 %% INTIALIZATION
@@ -89,19 +92,21 @@ for tt1=dt_out:dt_out:t_fin % "save cycle", save data at each step
   % Used the formula from https://www.nature.com/articles/nmeth.2367
   Dpool=sqrt(2*D*dt)*normrnd(0,1,[1,3*totR*ceil(dt_out/dt)]);  
  
-  % counters for drawing numbers from the pool
+  % counter for drawing numbers from the pool
   ddB=0; 
   
   % arrays to store the microtrajectories
-  xB = [];
-  yB = [];
-  zB = [];
+  x_M = ones(dt_out/dt,totR);
+  y_M = ones(dt_out/dt,totR);
+  z_M = ones(dt_out/dt,totR);
+  
+  % counter for storing microtrajectories
+  ii1 = 0;
   
   % ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   for tt2=dt:dt:dt_out % "silent" cycle, move without saving data
       
     tt=tt1+tt2; % current time
-
           
     % ~~~~~ Make BD moves    
  
@@ -111,10 +116,14 @@ for tt1=dt_out:dt_out:t_fin % "save cycle", save data at each step
        zB_new=z_R+Dpool(1,ddB+2*totR+1:ddB+3*totR);
        % apply reflecting boundaries, if necessary,
        [x_R,y_R,z_R] = apply_boundaries(xB_new,yB_new,zB_new);  
+       
+       ii1 = ii1+1;
+       x_M(ii1,:) = x_R;
+       y_M(ii1,:) = y_R;
+       z_M(ii1,:) = z_R;
      
-     % shift the counter 
+     % shift the pool counter 
      ddB=ddB+3*totR;
-
            
   end % "silent" cycle
   % ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -122,9 +131,10 @@ for tt1=dt_out:dt_out:t_fin % "save cycle", save data at each step
    % Current Data collection
    ii0=ii0+1;
    % position saved as the centroid of microtrajectories to mimic analysis procedure of experimental images
-   rne(ii0,1:3:end)=x_R;
-   rne(ii0,2:3:end)=y_R;
-   rne(ii0,3:3:end)=z_R;
+   % dynamic localization error ? is applied to each centroid location in both x and y coordinates 
+   rne(ii0,1:3:end)=mean(x_M)+sigma*normrnd(0,1);
+   rne(ii0,2:3:end)=mean(y_M)+sigma*normrnd(0,1);
+   rne(ii0,3:3:end)=mean(z_M)+sigma*normrnd(0,1);
 
 end % "save" cycle
 % ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
