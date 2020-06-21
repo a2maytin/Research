@@ -71,7 +71,7 @@ y_R=y_R0;
 z_R=z_R0; 
  
 % making data collectors for the output
-rne=111*ones(ceil(t_fin/dt_out)+1,3*totR);         % RNaseE coordinates
+rne=111*ones(floor(t_fin/dt_out)+1,3*totR);         % RNaseE coordinates
 
 % saving initial values - RNaseE coordinates states - at t=0;  
 rne(1,1:3:end)=x_R;
@@ -91,7 +91,7 @@ for tt1=dt_out:dt_out:t_fin % "save cycle", save data at each step
   % Get pool of random steps, i.e., Brownian dynamics steps
   % Used the formula from https://www.nature.com/articles/nmeth.2367
   Dpool=sqrt(2*D*dt)*normrnd(0,1,[1,3*totR*ceil(dt_out/dt)]);  
- 
+  Dpool(1)
   % counter for drawing numbers from the pool
   ddB=0; 
   
@@ -110,12 +110,15 @@ for tt1=dt_out:dt_out:t_fin % "save cycle", save data at each step
           
     % ~~~~~ Make BD moves    
  
-    % - bound RNaseE moves
+    % - RNaseE moves
        xB_new=x_R+Dpool(1,ddB+1:ddB+totR);
        yB_new=y_R+Dpool(1,ddB+totR+1:ddB+2*totR);
        zB_new=z_R+Dpool(1,ddB+2*totR+1:ddB+3*totR);
-       % apply reflecting boundaries, if necessary,
+       % apply reflecting boundaries
        [x_R,y_R,z_R] = apply_boundaries(xB_new,yB_new,zB_new);  
+       %x_R=xB_new;
+       %y_R=yB_new;
+       %z_R=zB_new;
        
        ii1 = ii1+1;
        x_M(ii1,:) = x_R;
@@ -132,9 +135,14 @@ for tt1=dt_out:dt_out:t_fin % "save cycle", save data at each step
    ii0=ii0+1;
    % position saved as the centroid of microtrajectories to mimic analysis procedure of experimental images
    % dynamic localization error ? is applied to each centroid location in both x and y coordinates 
-   rne(ii0,1:3:end)=mean(x_M)+sigma*normrnd(0,1);
-   rne(ii0,2:3:end)=mean(y_M)+sigma*normrnd(0,1);
-   rne(ii0,3:3:end)=mean(z_M)+sigma*normrnd(0,1);
+   
+   %rne(ii0,1:3:end)=mean(x_M)+sigma*normrnd(0,1,[1,totR]);
+   %rne(ii0,2:3:end)=mean(y_M)+sigma*normrnd(0,1,[1,totR]);
+   %rne(ii0,3:3:end)=mean(z_M)+sigma*normrnd(0,1,[1,totR]);
+   
+   rne(ii0,1:3:end)=x_R+sigma*normrnd(0,1,[1,totR]);
+   rne(ii0,2:3:end)=y_R+sigma*normrnd(0,1,[1,totR]);
+   rne(ii0,3:3:end)=z_R+sigma*normrnd(0,1,[1,totR]);
 
 end % "save" cycle
 % ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -174,10 +182,12 @@ function params_out = change_parameters(params_in)
 
  params0.D=0.01; % diffusion coefficient
  
- params0.sigma=0.01; % dynamic localization error
+ params0.sigma=0.04; % dynamic localization error
   
+ params0.space='um'; % space units
+ params0.time='s'; % time units
  params0.dim=3; % Dimension of simulations;
- params0.script=script; %'diffusing_RNaseE';
+ params0.script=script; %'random_diffusion_3D_SphCyl';
  params0.model='1-state model';
  params0.version='2020.06.10';
   
