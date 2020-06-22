@@ -15,9 +15,9 @@ dT = 0.02; % s,
 
 N_PARTICLES = numel(pos);
 
-tracks = cell(1000, 1);
+tracks = cell(N_PARTICLES, 1);
 
-for i = 1 : 1000 %N_PARTICLES
+for i = 1 : N_PARTICLES %N_PARTICLES
 
     % Time
     time = (0 : size(pos{i},1)-1)' * dT;
@@ -69,7 +69,7 @@ TIME_UNITS = 's';
 
 % Create simulated trajectories
 Dsim = 0.2;
-steps = 7;
+steps = 100;
 msteps = 10;
 tausim = 0.02;
 
@@ -110,12 +110,12 @@ ma.plotMSD;
 figure
 ma.plotMeanMSD(gca, true)
 
-[fo, gof] = ma.fitMeanMSDandrew;
+[fo, gof] = ma.fitMeanMSD;
 plot(fo)
 ma.labelPlotMSD;
 legend off
 
-ma = ma.fitMSDandrew;
+ma = ma.fitMSD;
 
 good_enough_fit = ma.lfit.r2fit > 0.8;
 Dval=ma.lfit.a;

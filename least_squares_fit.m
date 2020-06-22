@@ -71,7 +71,8 @@ grid on;
 xlim([0, 0.8]);
 xlabel('Single Step Displacement (um)', 'FontSize', 14);
 ylabel('Bin Count', 'FontSize', 14);
-title('Measured Data (Blue) vs Simulated Data (Orange)', 'FontSize', 14);
+title('SSD Histogram: Experimental, Simulated with averaging', 'FontSize', 14);
+
 
 % Analytical form (free diffusion 3D)
 hold on
@@ -91,6 +92,8 @@ func2=dr*(1./Dsim)*y/(2*tau).*exp((1./Dsim)*-y.^2/(4*tau));
 func=f*funcv;
 plot(y,func,'LineWidth',1.5)
 plot(y,func2,'LineWidth',1.5)
+
+legend({'r_{exp}','r_{model}','vbPST linear combi.','D_{sim}, f=1'},'FontSize',14)
 
 %% look at abs(displacement in x)
 

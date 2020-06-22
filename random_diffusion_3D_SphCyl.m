@@ -91,7 +91,7 @@ for tt1=dt_out:dt_out:t_fin % "save cycle", save data at each step
   % Get pool of random steps, i.e., Brownian dynamics steps
   % Used the formula from https://www.nature.com/articles/nmeth.2367
   Dpool=sqrt(2*D*dt)*normrnd(0,1,[1,3*totR*ceil(dt_out/dt)]);  
-  Dpool(1)
+
   % counter for drawing numbers from the pool
   ddB=0; 
   
@@ -115,10 +115,10 @@ for tt1=dt_out:dt_out:t_fin % "save cycle", save data at each step
        yB_new=y_R+Dpool(1,ddB+totR+1:ddB+2*totR);
        zB_new=z_R+Dpool(1,ddB+2*totR+1:ddB+3*totR);
        % apply reflecting boundaries
-       [x_R,y_R,z_R] = apply_boundaries(xB_new,yB_new,zB_new);  
-       %x_R=xB_new;
-       %y_R=yB_new;
-       %z_R=zB_new;
+       %[x_R,y_R,z_R] = apply_boundaries(xB_new,yB_new,zB_new);  
+       x_R=xB_new;
+       y_R=yB_new;
+       z_R=zB_new;
        
        ii1 = ii1+1;
        x_M(ii1,:) = x_R;
@@ -133,13 +133,14 @@ for tt1=dt_out:dt_out:t_fin % "save cycle", save data at each step
 
    % Current Data collection
    ii0=ii0+1;
+   
    % position saved as the centroid of microtrajectories to mimic analysis procedure of experimental images
    % dynamic localization error ? is applied to each centroid location in both x and y coordinates 
-   
    %rne(ii0,1:3:end)=mean(x_M)+sigma*normrnd(0,1,[1,totR]);
    %rne(ii0,2:3:end)=mean(y_M)+sigma*normrnd(0,1,[1,totR]);
    %rne(ii0,3:3:end)=mean(z_M)+sigma*normrnd(0,1,[1,totR]);
    
+   % position saved as final position after all microsteps
    rne(ii0,1:3:end)=x_R+sigma*normrnd(0,1,[1,totR]);
    rne(ii0,2:3:end)=y_R+sigma*normrnd(0,1,[1,totR]);
    rne(ii0,3:3:end)=z_R+sigma*normrnd(0,1,[1,totR]);
