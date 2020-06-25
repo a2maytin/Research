@@ -11,7 +11,7 @@ conversion = .16; %each pixel is 160 nm = .16 um
 a = load('SK249-rif_tracksFinal.mat');
 b = a.tracksFinal;
 pos = {b.tracksCoordXY};
-dT = 0.02; % s,
+dT = 0.021742; % s,
 
 N_PARTICLES = numel(pos);
 
@@ -76,7 +76,7 @@ tausim = 0.02;
 params1.dt=tausim/msteps;  
 params1.dt_out=tausim; %time between each frame (exposure time) in s
 params1.t_fin=tausim*steps; 
-params1.totR=100;
+params1.totR=1000;
 params1.D=Dsim; %in um^s/s
 [rne,tt,params]=random_diffusion_3D_SphCyl(params1);
 N=params.totR; 
@@ -100,22 +100,23 @@ clear i X time
 close all
 ma = msdanalyzer(2, SPACE_UNITS, TIME_UNITS);
 ma = ma.addAll(tracks2);
-ma.plotTracks;
-ma.labelPlotTracks;
+%ma.plotTracks;
+%ma.labelPlotTracks;
 ma = ma.computeMSD;
 ma.msd;
-figure
-ma.plotMSD;
+%figure
+%ma.plotMSD;
 
 figure
-ma.plotMeanMSD(gca, true)
+ma.plotMeanMSDandrew(gca, true)
 
 [fo, gof] = ma.fitMeanMSD;
 plot(fo)
-ma.labelPlotMSD;
+ma.labelPlotMSDandrew;
 legend off
+title('MSD Fit: Simulation w/ localization error and averaging microsteps')
 
-ma = ma.fitMSD;
+ma = ma.fitMSDandrew;
 
 good_enough_fit = ma.lfit.r2fit > 0.8;
 Dval=ma.lfit.a;

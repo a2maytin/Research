@@ -1,4 +1,4 @@
-function [rne,tt,params] = random_diffusion_3D_SphCyl(params)
+function [rne,tt,params] = rand_diff_3D_SphCyl_theo(params)
 % To simulate 3D dynamics of RNaseE in 249 and 249-rif
 % This is a simplified version of the code used in the paper
 % Surovtsev et al. PNAS 2016 113 E7266 
@@ -7,6 +7,10 @@ function [rne,tt,params] = random_diffusion_3D_SphCyl(params)
 % Simulations organized as a nested loops with "silent" internal loop that run simulations without saving coordinates, 
 %   and external loop in which corrdinates are saved at each iteration.
 % All simulations are within a 3D spherocylinder with reflective boundaries  
+%
+% "Theoretical Version": This version is meant to model RNaseE trajectories
+% in 3D cell geometry. The reported postions represent the absolute
+% RNaseE positions at the end of every frame.
 %
 % INPUT:
 %   params - parameters for simulation with multiple fields, for example:
@@ -26,7 +30,7 @@ function [rne,tt,params] = random_diffusion_3D_SphCyl(params)
 %__________________________________________________________
 %%
 
-
+bounce = 0;
 %% Parameters
  % First, define all required parameters of simulations 
  % If values provided in the input "params" - change default values to ones provided in params
@@ -115,10 +119,13 @@ for tt1=dt_out:dt_out:t_fin % "save cycle", save data at each step
        yB_new=y_R+Dpool(1,ddB+totR+1:ddB+2*totR);
        zB_new=z_R+Dpool(1,ddB+2*totR+1:ddB+3*totR);
        % apply reflecting boundaries
-       %[x_R,y_R,z_R] = apply_boundaries(xB_new,yB_new,zB_new);  
-       x_R=xB_new;
-       y_R=yB_new;
-       z_R=zB_new;
+       [x_R,y_R,z_R] = apply_boundaries(xB_new,yB_new,zB_new);
+
+       bounce = bounce+sum(xB_new ~= x_R);
+
+       %x_R=xB_new;
+       %y_R=yB_new;
+       %z_R=zB_new;
        
        ii1 = ii1+1;
        x_M(ii1,:) = x_R;
@@ -175,15 +182,15 @@ function params_out = change_parameters(params_in)
  params0.dt_out=1; % data output time step
  params0.t_fin=10; % end time of simulation
 
- l_0=2.3; w_0=0.5; % cell length and width
+ l_0=3.0; w_0=1.1; % cell length and width (real cell averages: l = 3.0, w = 1.1)
  params0.l0=l_0; %l_0=2.5;    % cell length
  params0.w0=w_0; %w_0=0.5;  % cell width
 
  params0.totR=90;  % number of RNaseE
 
- params0.D=0.01; % diffusion coefficient
+ params0.D=0.2; % diffusion coefficient
  
- params0.sigma=0.04; % dynamic localization error
+ params0.sigma=0.00; % dynamic localization error
   
  params0.space='um'; % space units
  params0.time='s'; % time units
@@ -233,5 +240,5 @@ function [x_new,y_new,z_new] = apply_boundaries(x,y,z)
 end
 
 %% END of ENDS
-
+disp(bounce)
 end

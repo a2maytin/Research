@@ -17,7 +17,7 @@ function obj = fitMSDandrew(obj)
 
 n_spots = numel(obj.msd);
 
-fprintf('Fitting %d curves of MSD = f(t), taking only the first 2 points of each curve and the origin... ', n_spots)
+fprintf('Fitting %d curves of MSD = f(t), taking only the first 2 points of each curve and thru the origin... ', n_spots)
 
 a = NaN(n_spots, 1);
 b = NaN(n_spots, 1);
@@ -58,7 +58,7 @@ for i_spot = 1 : n_spots %loop through every track
     r2fit(i_spot) = fit.Rsquared.Ordinary;
     
 end
-fprintf('\b\b\b\b\b\b\b\b\bDone.\n')
+fprintf('\b\b\b\b\b\b\b\b\b\bDone.\n')
 
 obj.lfit = struct(...
     'a', a, ...

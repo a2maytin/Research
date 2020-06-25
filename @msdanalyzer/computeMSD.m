@@ -107,7 +107,7 @@ for i = 1 : n_tracks
     obj.msd{index} = [ delays mean_msd std_msd n_msd ];
     
 end
-fprintf('\b\b\b\b\b\b\b\b\bDone.\n')
+fprintf('\b\b\b\b\b\b\b\b\b\bDone.\n')
 
 obj.msd_valid = true;
 
