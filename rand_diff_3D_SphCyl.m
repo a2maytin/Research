@@ -1,4 +1,4 @@
-function [rne,tt,params] = rand_diff_3D_SphCyl_theo(params)
+function [rne,tt,params] = rand_diff_3D_SphCyl(params)
 % To simulate 3D dynamics of RNaseE in 249 and 249-rif
 % This is a simplified version of the code used in the paper
 % Surovtsev et al. PNAS 2016 113 E7266 
@@ -8,9 +8,17 @@ function [rne,tt,params] = rand_diff_3D_SphCyl_theo(params)
 %   and external loop in which corrdinates are saved at each iteration.
 % All simulations are within a 3D spherocylinder with reflective boundaries  
 %
-% "Theoretical Version": This version is meant to model RNaseE trajectories
-% in 3D cell geometry. The reported postions represent the absolute
-% RNaseE positions at the end of every frame.
+% 
+% Experimental Version: This version is meant to mimic the measurement
+% process. Therefore the reported moleceule positions after every frame are
+% taken as the average of all the microstep positions, and dynamic 
+% localization error is modeled as added gaussian noise. In this sense the 
+% reported positions are like the "measured" positions from under a
+% microscope. (params.avg = true, params.loc = true)
+%
+% Theoretical Version (Default): This version is meant to model RNaseE trajectories
+% in 3D cell geometry. The reported postions are the absolute RNaseE 
+% positions at the end of every frame. (params.avg = false, params.loc = false)
 %
 % INPUT:
 %   params - parameters for simulation with multiple fields, for example:
@@ -30,7 +38,7 @@ function [rne,tt,params] = rand_diff_3D_SphCyl_theo(params)
 %__________________________________________________________
 %%
 
-bounce = 0;
+
 %% Parameters
  % First, define all required parameters of simulations 
  % If values provided in the input "params" - change default values to ones provided in params
@@ -47,11 +55,10 @@ t_fin=params.t_fin; % end time of simulation
 l0=params.l0;    % cell length
 w0=params.w0;  % cell width
 
- % free and bound RNaseE-related parameters
 totR=params.totR;  % number of RNaseE
 D=params.D; % Diffusion coefficient
-
-% microscope parameters
+loc=params.loc;
+avg=params.avg;
 sigma=params.sigma; % dynamic localization error
 
 
@@ -119,10 +126,7 @@ for tt1=dt_out:dt_out:t_fin % "save cycle", save data at each step
        yB_new=y_R+Dpool(1,ddB+totR+1:ddB+2*totR);
        zB_new=z_R+Dpool(1,ddB+2*totR+1:ddB+3*totR);
        % apply reflecting boundaries
-       %[x_R,y_R,z_R] = apply_boundaries(xB_new,yB_new,zB_new);
-
-       bounce = bounce+sum(xB_new ~= x_R);
-
+       %[x_R,y_R,z_R] = apply_boundaries(xB_new,yB_new,zB_new);  
        x_R=xB_new;
        y_R=yB_new;
        z_R=zB_new;
@@ -141,16 +145,24 @@ for tt1=dt_out:dt_out:t_fin % "save cycle", save data at each step
    % Current Data collection
    ii0=ii0+1;
    
+   if avg
    % position saved as the centroid of microtrajectories to mimic analysis procedure of experimental images
-   % dynamic localization error ? is applied to each centroid location in both x and y coordinates 
-   %rne(ii0,1:3:end)=mean(x_M)+sigma*normrnd(0,1,[1,totR]);
-   %rne(ii0,2:3:end)=mean(y_M)+sigma*normrnd(0,1,[1,totR]);
-   %rne(ii0,3:3:end)=mean(z_M)+sigma*normrnd(0,1,[1,totR]);
-   
+   rne(ii0,1:3:end)=mean(x_M)+sigma*normrnd(0,1,[1,totR]);
+   rne(ii0,2:3:end)=mean(y_M)+sigma*normrnd(0,1,[1,totR]);
+   rne(ii0,3:3:end)=mean(z_M)+sigma*normrnd(0,1,[1,totR]);  
+   else
    % position saved as final position after all microsteps
    rne(ii0,1:3:end)=x_R+sigma*normrnd(0,1,[1,totR]);
    rne(ii0,2:3:end)=y_R+sigma*normrnd(0,1,[1,totR]);
    rne(ii0,3:3:end)=z_R+sigma*normrnd(0,1,[1,totR]);
+   end
+   
+   if loc
+   % dynamic localization error is applied to each centroid location in both x and y coordinates 
+   rne(ii0,1:3:end)=rne(ii0,1:3:end)+sigma*normrnd(0,1,[1,totR]);
+   rne(ii0,2:3:end)=rne(ii0,2:3:end)+sigma*normrnd(0,1,[1,totR]);
+   rne(ii0,3:3:end)=rne(ii0,3:3:end)
+   end
 
 end % "save" cycle
 % ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -182,7 +194,7 @@ function params_out = change_parameters(params_in)
  params0.dt_out=1; % data output time step
  params0.t_fin=10; % end time of simulation
 
- l_0=3.0; w_0=1.1; % cell length and width (real cell averages: l = 3.0, w = 1.1)
+ l_0=3.0; w_0=1.1; % cell length and width
  params0.l0=l_0; %l_0=2.5;    % cell length
  params0.w0=w_0; %w_0=0.5;  % cell width
 
@@ -190,6 +202,9 @@ function params_out = change_parameters(params_in)
 
  params0.D=0.2; % diffusion coefficient
  
+ params0.avg=false; %boolean to activate averaging
+ 
+ params0.loc=false; %boolean to activate dynamic localization error
  params0.sigma=0.00; % dynamic localization error
   
  params0.space='um'; % space units
@@ -224,23 +239,6 @@ end
 
 %^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 function [x_new,y_new,z_new] = apply_boundaries(x,y,z)  
-% applies sticky boundaries shaped as spherocylinder with cylinder length Lcyl and cylinder and caps radious Rcyl
-   x_new=x;
-   y_new=y;
-   z_new=z;
-
-  xL=abs(x)-Lcyl0;
-  %r_old=sqrt(heaviside(xL).*xL.^2+y.^2+z.^2);
-  r_old=sqrt((xL>0).*xL.^2+y.^2+z.^2); % using logical seems faster than heaviside
-  ind=(r_old>Rcyl);
-  r_new=Rcyl;
-  x_new(ind)=(xL(ind)>0).*sign(x(ind)).*(Lcyl0+xL(ind).*r_new./r_old(ind)) + (xL(ind)<=0).*x(ind);
-  y_new(ind)=y(ind).*r_new./r_old(ind);
-  z_new(ind)=z(ind).*r_new./r_old(ind);
-end
-
-%^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-function [x_new,y_new,z_new] = apply_boundaries_reflect(x,y,z)  
 % applies reflective boundaries shaped as spherocylinder with cylinder length Lcyl and cylinder and caps radious Rcyl
    x_new=x;
    y_new=y;
@@ -255,6 +253,7 @@ function [x_new,y_new,z_new] = apply_boundaries_reflect(x,y,z)
   y_new(ind)=y(ind).*r_new./r_old(ind);
   z_new(ind)=z(ind).*r_new./r_old(ind);
 end
+
 %% END of ENDS
-disp(bounce)
+
 end

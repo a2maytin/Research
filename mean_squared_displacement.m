@@ -43,12 +43,12 @@ ma.plotMSD;
 figure
 ma.plotMeanMSD(gca, true)
 
-[fo, gof] = ma.fitMeanMSD;
+[fo, gof] = ma.fitMeanMSD(2);
 plot(fo)
 ma.labelPlotMSD;
 legend off
 
-ma = ma.fitMSDandrew;
+ma = ma.fitMSD;
 
 good_enough_fit = ma.lfit.r2fit > 0.8;
 Dval = ma.lfit.a / 2 / ma.n_dim;

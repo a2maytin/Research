@@ -9,7 +9,7 @@ params.dt=0.1;
 params.dt_out=1;
 params.t_fin=10;
 %params.l0=2.3;
-%params.totR=100;
+params.totR=100;
 params.D=0.2;
 
 %Simulate trajectories
