@@ -45,7 +45,7 @@ w = w(t_limit);
 [fo, gof] = fit(t, y, ft); %Note: I got rid of weights
 
 str = sprintf([
-    'Estimating D through linear fit of the weighted EATA MSD curve (first two delays).\n', ...
+    'Estimating D through linear fit of the EATA MSD curve (first two delays).\n', ...
     'D = %.3e'], fo.p1/2/obj.n_dim);
 disp(str)
 

@@ -180,3 +180,78 @@ ylabel('Bin Count Residual (Normalized)', 'FontSize', 14);
 title('Simulated Data Deviation from Measured Data','FontSize', 14);
 %legend({'2 state w/ boundary','2-state no boundary'},'FontSize',14)
 
+%% 4 way comparison
+clc
+clear all
+close all
+% Plot simulated "theo" trajectories 1
+Dsim = 0.2;  % in um^2/s
+steps = 10;
+msteps = 100;
+tausim = 0.02; %time between each frame (exposure time) in s
+totR = 6000;
+sigma = 0.04;
+
+params1.dt=tausim/msteps;  
+params1.dt_out=tausim; 
+params1.t_fin=tausim*steps; 
+params1.totR=totR;
+params1.D=Dsim; 
+params1.sigma = sigma;
+[rne,~,~]=rand_diff_3D_SphCyl(params1);
+params1.avg = true;
+[rne_a,~,~]=rand_diff_3D_SphCyl(params1); % averaging
+params1.loc = true;
+[rne_la,~,~]=rand_diff_3D_SphCyl(params1); %loc error and averaging
+params1.avg = false;
+[rne_l,~,~]=rand_diff_3D_SphCyl(params1); % loc error
+
+r_p=ones(1,(size(rne,1)-1)*totR);  %array will store simulated displacements
+r_a=ones(1,(size(rne,1)-1)*totR);  
+r_la=ones(1,(size(rne,1)-1)*totR);  
+r_l=ones(1,(size(rne,1)-1)*totR);  
+
+
+h = 1; %counter for pooling displacements
+
+for j = 1:totR %loop through every track
+    for i = 1:(size(rne,1)-1) %loop through every displacement
+        r_new = sqrt((rne(i+1,3*j-2)-rne(i,3*j-2))^2+(rne(i+1,3*j-1)-rne(i,3*j-1))^2);
+        r_p(h) = r_new;
+        
+        r_new1 = sqrt((rne_a(i+1,3*j-2)-rne_a(i,3*j-2))^2+(rne_a(i+1,3*j-1)-rne_a(i,3*j-1))^2);
+        r_a(h) = r_new1;
+        
+        r_new2 = sqrt((rne_la(i+1,3*j-2)-rne_la(i,3*j-2))^2+(rne_la(i+1,3*j-1)-rne_la(i,3*j-1))^2);
+        r_la(h) = r_new2;
+        
+        r_new3 = sqrt((rne_l(i+1,3*j-2)-rne_l(i,3*j-2))^2+(rne_l(i+1,3*j-1)-rne_l(i,3*j-1))^2);
+        r_l(h) = r_new3;
+        h=h+1;
+    end
+end
+
+figure;
+h1 = histogram(r_p)
+h1.Normalization = 'probability';
+h1.BinWidth = 0.01;
+hold on
+h2 = histogram(r_a)
+h2.Normalization = 'probability';
+h2.BinWidth = 0.01;
+%hold on
+%h3 = histogram(r_la)
+%h3.Normalization = 'probability';
+%h3.BinWidth = 0.01;
+hold on
+h4 = histogram(r_l)
+h4.Normalization = 'probability';
+h4.BinWidth = 0.01;
+grid on;
+
+xlim([0, 0.8]);
+xlabel('Single Step Displacement (um)', 'FontSize', 14);
+ylabel('Bin Count (Normalized)', 'FontSize', 14);
+title('Localization Error, Averaging Effect on Simulated SSD Histogram','FontSize', 14);
+legend('no loc error, no avg','avg','loc error','FontSize',14)
+%legend('no loc error, no avg','loc error and avg','FontSize',14)

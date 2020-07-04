@@ -5,9 +5,9 @@ close all
 %Plot generated RNaseE trajectories
 
 %Set parameters
-params.dt=0.1;
-params.dt_out=1;
-params.t_fin=10;
+params.dt=0.002;
+params.dt_out=0.02;
+params.t_fin=1;
 %params.l0=2.3;
 params.totR=100;
 params.D=0.2;
@@ -15,7 +15,7 @@ params.D=0.2;
 %Simulate trajectories
 %    rne - coordinates of RNaseE vs time, i-th row is a snap shot of coordinates of all 
 %          RNaseE (X1,Y1, Z1, X2,Y2, Z2 ...) at a given time,(i-1)*dt_out
-[rne,tt,params]=rand_diff_3D_SphCyl_theo(params);
+[rne,tt,params]=rand_diff_3D_SphCyl(params);
 x=rne(:,1:3:end);
 y=rne(:,2:3:end);
 z=rne(:,3:3:end);
@@ -26,7 +26,7 @@ plot(x,y)
 %plot(mean(x),mean(y),'o')
 
 %Plot 3D trajectories
-%plot3(x,y,z)
+plot3(x,y,z)
 
 grid on
 daspect([1 1 1])

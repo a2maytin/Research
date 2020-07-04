@@ -126,10 +126,10 @@ for tt1=dt_out:dt_out:t_fin % "save cycle", save data at each step
        yB_new=y_R+Dpool(1,ddB+totR+1:ddB+2*totR);
        zB_new=z_R+Dpool(1,ddB+2*totR+1:ddB+3*totR);
        % apply reflecting boundaries
-       %[x_R,y_R,z_R] = apply_boundaries(xB_new,yB_new,zB_new);  
-       x_R=xB_new;
-       y_R=yB_new;
-       z_R=zB_new;
+       [x_R,y_R,z_R] = apply_boundaries(xB_new,yB_new,zB_new);  
+       %x_R=xB_new;
+       %y_R=yB_new;
+       %z_R=zB_new;
        
        ii1 = ii1+1;
        x_M(ii1,:) = x_R;
@@ -161,7 +161,7 @@ for tt1=dt_out:dt_out:t_fin % "save cycle", save data at each step
    % dynamic localization error is applied to each centroid location in both x and y coordinates 
    rne(ii0,1:3:end)=rne(ii0,1:3:end)+sigma*normrnd(0,1,[1,totR]);
    rne(ii0,2:3:end)=rne(ii0,2:3:end)+sigma*normrnd(0,1,[1,totR]);
-   rne(ii0,3:3:end)=rne(ii0,3:3:end)
+   rne(ii0,3:3:end)=rne(ii0,3:3:end);
    end
 
 end % "save" cycle

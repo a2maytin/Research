@@ -6,15 +6,15 @@ close all
 SPACE_UNITS = 'µm';
 TIME_UNITS = 's';
 
-conversion = .16; %each pixel is 160 nm = .16 um
+% convert units to SI units
+pixelSize = 160e-9; 
+dT = 21.742e-3;
 
 a = load('SK249-rif_tracksFinal.mat');
 b = a.tracksFinal;
 pos = {b.tracksCoordXY};
-dT = 0.021742; % s,
 
 N_PARTICLES = numel(pos);
-
 tracks = cell(N_PARTICLES, 1);
 
 for i = 1 : N_PARTICLES %N_PARTICLES
@@ -23,7 +23,7 @@ for i = 1 : N_PARTICLES %N_PARTICLES
     time = (0 : size(pos{i},1)-1)' * dT;
 
     % Position
-    X = pos{i}.*conversion;
+    X = pos{i}.*pixelSize;
 
     % Store
     tracks{i} = [time X];
@@ -31,23 +31,64 @@ for i = 1 : N_PARTICLES %N_PARTICLES
 end
 clear i X time
 close all
+
+%ma.plotTracks;
+%ma.labelPlotTracks;
+
+%%
 ma = msdanalyzer(2, SPACE_UNITS, TIME_UNITS);
 ma = ma.addAll(tracks);
-ma.plotTracks;
-ma.labelPlotTracks;
 ma = ma.computeMSD;
-ma.msd;
-figure
-ma.plotMSD;
 
+%% Default MSD (weighted EATA MSD)
+close all
+%figure
+%ma.plotMSD;
 figure
 ma.plotMeanMSD(gca, true)
-
 [fo, gof] = ma.fitMeanMSD(2);
 plot(fo)
 ma.labelPlotMSD;
+xlim([0, 0.06])
+ylim([0, 0.5e-13])
 legend off
+lerror = 1/2*sqrt(fo.p2+fo.p1*dT/3);
+fprintf('Estimation of the dynamic localization error:\n')
+fprintf('sigma = %.3g\n', lerror);
 
+%% EATA MSD
+
+figure
+ma.plotEATAMSD; 
+hold on
+[fo2, gof2] = ma.fitEAMSD(2);
+plot(fo2)
+ma.labelPlotMSD;
+xlim([0, 0.06])
+ylim([0, 0.5e-13])
+legend off
+lerror = 1/2*sqrt(fo2.p2+fo2.p1*dT/3);
+fprintf('Estimation of the dynamic localization error:\n')
+fprintf('sigma = %.3g\n', lerror);
+
+%% EA MSD
+ma = ma.computeEAMSD;
+
+figure
+ma.plotEAMSD; 
+hold on
+[fo3, gof3] = ma.fitEAMSD(2);
+plot(fo3)
+ma.labelPlotMSD;
+xlim([0, 0.06])
+ylim([0, 0.5e-13])
+legend off
+lerror = 1/2*sqrt(fo3.p2+fo3.p1*dT/3);
+fprintf('Estimation of the dynamic localization error:\n')
+fprintf('sigma = %.3g\n', lerror);
+
+
+%% Fit Individual MSD Cirves, take average D
 ma = ma.fitMSD;
 
 good_enough_fit = ma.lfit.r2fit > 0.8;
@@ -57,7 +98,7 @@ Dstd  =  std( ma.lfit.a(good_enough_fit) ) / 2 / ma.n_dim;
 
 fprintf('Estimation of the diffusion coefficient from linear fit of the MSD curves:\n')
 fprintf('D = %.3g ± %.3g (mean ± std, N = %d)\n', ...
-    Dmean, Dstd, sum(good_enough_fit));
+   Dmean, Dstd, sum(good_enough_fit));
 
 %% Simulated data
 clear all

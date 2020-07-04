@@ -1,4 +1,4 @@
-function  varargout = fitMeanMSD(obj, clip_factor)
+function  varargout = fitEAMSD(obj, clip_factor)
 %%FITMEANMSD Fit the weighted averaged MSD by a linear function.
 %
 % obj.fitMeanMSD computes and fits the weighted mean MSD by a
@@ -25,11 +25,11 @@ if ~obj.msd_valid
 end
 
 ft = fittype('poly1');
-mmsd = obj.getMeanMSD;
+mmsd = obj.getEAMSD;
 
 t = mmsd(:,1);
 y = mmsd(:,2);
-w = 1./mmsd(:,3);
+w = ones(size(y)); %all weighted equally
 
 % Clip data, never take the first one dt = 0
 if clip_factor < 1
@@ -45,7 +45,7 @@ w = w(t_limit);
 [fo, gof] = fit(t, y, ft); %Note: I got rid of weights
 
 str = sprintf([
-    'Estimating D through linear fit of the weighted EATA MSD curve (first two delays).\n', ...
+    'Estimating D through linear fit of the EA MSD curve (first two delays).\n', ...
     'D = %.3e'], fo.p1/2/obj.n_dim);
 disp(str)
 
