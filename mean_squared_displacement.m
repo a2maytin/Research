@@ -100,6 +100,16 @@ fprintf('Estimation of the diffusion coefficient from linear fit of the MSD curv
 fprintf('D = %.3g ± %.3g (mean ± std, N = %d)\n', ...
    Dmean, Dstd, sum(good_enough_fit));
 
+%% Histogram of MSD(n=1)
+msd =  {b.MSD};
+msd_1 = zeros(1,numel(msd));
+for i = 1:numel(msd)
+    msd_1(i) = msd{i}(1,1);
+end
+
+h = histogram(msd_1)
+h.BinWidth = 1e-15;
+
 %% Simulated data
 clear all
 clc

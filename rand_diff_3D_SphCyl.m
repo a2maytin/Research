@@ -60,6 +60,7 @@ D=params.D; % Diffusion coefficient
 loc=params.loc;
 avg=params.avg;
 sigma=params.sigma; % dynamic localization error
+boundary= params.boundary;
 
 
 %% INTIALIZATION
@@ -125,11 +126,14 @@ for tt1=dt_out:dt_out:t_fin % "save cycle", save data at each step
        xB_new=x_R+Dpool(1,ddB+1:ddB+totR);
        yB_new=y_R+Dpool(1,ddB+totR+1:ddB+2*totR);
        zB_new=z_R+Dpool(1,ddB+2*totR+1:ddB+3*totR);
+       if boundary
        % apply reflecting boundaries
-       [x_R,y_R,z_R] = apply_boundaries(xB_new,yB_new,zB_new);  
-       %x_R=xB_new;
-       %y_R=yB_new;
-       %z_R=zB_new;
+       [x_R,y_R,z_R] = apply_boundaries(xB_new,yB_new,zB_new);
+       else
+       x_R=xB_new;
+       y_R=yB_new;
+       z_R=zB_new;
+       end
        
        ii1 = ii1+1;
        x_M(ii1,:) = x_R;
@@ -147,14 +151,14 @@ for tt1=dt_out:dt_out:t_fin % "save cycle", save data at each step
    
    if avg
    % position saved as the centroid of microtrajectories to mimic analysis procedure of experimental images
-   rne(ii0,1:3:end)=mean(x_M)+sigma*normrnd(0,1,[1,totR]);
-   rne(ii0,2:3:end)=mean(y_M)+sigma*normrnd(0,1,[1,totR]);
-   rne(ii0,3:3:end)=mean(z_M)+sigma*normrnd(0,1,[1,totR]);  
+   rne(ii0,1:3:end)=mean(x_M);
+   rne(ii0,2:3:end)=mean(y_M);
+   rne(ii0,3:3:end)=mean(z_M);
    else
    % position saved as final position after all microsteps
-   rne(ii0,1:3:end)=x_R+sigma*normrnd(0,1,[1,totR]);
-   rne(ii0,2:3:end)=y_R+sigma*normrnd(0,1,[1,totR]);
-   rne(ii0,3:3:end)=z_R+sigma*normrnd(0,1,[1,totR]);
+   rne(ii0,1:3:end)=x_R;
+   rne(ii0,2:3:end)=y_R;
+   rne(ii0,3:3:end)=z_R;
    end
    
    if loc
@@ -201,6 +205,8 @@ function params_out = change_parameters(params_in)
  params0.totR=90;  % number of RNaseE
 
  params0.D=0.2; % diffusion coefficient
+ 
+ params0.boundary=false; %boolean to activate boundary
  
  params0.avg=false; %boolean to activate averaging
  

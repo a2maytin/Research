@@ -206,19 +206,20 @@ ylabel('Residual Count', 'FontSize', 14);
 title('Histogram Count Residuals','FontSize', 14);
 legend({'2 state w/ boundary','2-state no boundary'},'FontSize',14)
 %% look at abs(displacement in x)
-
+clear
 % Create simulated trajectories
 Dsim = 0.2;
 steps = 10;
 msteps = 50;
 tausim = 0.02;
-
+sigma = 0.04;
 params1.dt=tausim/msteps;  
 params1.dt_out=tausim; %time between each frame (exposure time) in s
 params1.t_fin=tausim*steps; 
 params1.totR=6000;
 params1.D=Dsim; %in um^s/s
-[rne,tt,params]=random_diffusion_3D_SphCyl(params1);
+params1.avg = true;
+[rne,tt,params]=rand_diff_3D_SphCyl(params1);
 totR = params.totR;
 r=ones(1,(size(rne,1)-1)*totR);  %array will store simulated displacements
 
@@ -240,7 +241,7 @@ h2.BinWidth = 0.01;
 %plot a gaussian with stdev sqrt(2Dtau)
 hold on
 y = -0.4:0.01:0.4;
-k = sqrt(2 * Dsim * tausim);
+k = sqrt(2 * Dsim * tausim - 2/3 * Dsim * tausim);
 func = 0.01*normpdf(y,0,k);
 plot(y,func,'LineWidth',1.5)
 

@@ -11,7 +11,7 @@ params.t_fin=1;
 %params.l0=2.3;
 params.totR=100;
 params.D=0.2;
-
+params.boundary = true;
 %Simulate trajectories
 %    rne - coordinates of RNaseE vs time, i-th row is a snap shot of coordinates of all 
 %          RNaseE (X1,Y1, Z1, X2,Y2, Z2 ...) at a given time,(i-1)*dt_out
@@ -26,7 +26,7 @@ plot(x,y)
 %plot(mean(x),mean(y),'o')
 
 %Plot 3D trajectories
-plot3(x,y,z)
+%plot3(x,y,z)
 
 grid on
 daspect([1 1 1])
