@@ -1,0 +1,8 @@
+% max_likelihood_fit
+% perform a log-liklihood fit to the experimental data
+% compare to least squares fit; they should match.
+
+% find the likelihood of a simulated data set compared to model:
+
+loglik = 
+lik = 

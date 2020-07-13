@@ -46,8 +46,11 @@ edges = [0:dr:limit];
 D=[.077,.2,.43,1.65];
 f=[.31,.53,.12,.04];
 
-counts_mod = counts_model(D, f, limit);
+counts_mod = counts_model()
 
+limit = 0.3;
+dr = 0.01;
+edges = [0:dr:limit];
 
 
 

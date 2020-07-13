@@ -1,21 +1,37 @@
-% To estimate the dynamic localization errors sigma_fast and sigma_slow for
-% RNaseE, use six-step trajectories to form the distribution of the mean of 
-% six one-step estimates of D
-
+clear
 % Import the measured trajectories
-a = load('SK249-rif_tracksFinal.mat');
-b = a.tracksFinal;
-pos = {b.tracksCoordXY};
+file = load('SK249-rif_tracksFinal.mat');
+traj = file.tracksFinal;
+coord = {traj.tracksCoordAmpCG};
 
+pos = {traj.tracksCoordXY};
 
-%% Find the fast and slow cutoff
+% convert units to SI units
+pixelSize = 160e-9; 
+timeStep = 21.742e-3;
 
-tau=21.742; %time between each frame (exposure time) in ms
+r_expm=ones(1,(sum(cellfun(@length, pos))-numel(pos))); %array will store experimental displacements
+stdev_pool=ones(1,2*sum(cellfun(@length, pos))); %array will store experimental displacements
 
-D6_mean=1/(24*tau)*sum()
+k = 1; %counter for pooling displacements
+s = 1; %counter for pooling stdev
 
+for i = 1:numel(pos) %loop through every track
+    for j = 1:(length(pos{i})-1) %loop through every displacement
+        r_new = sqrt((pos{i}(j+1,1)-pos{i}(j,1))^2+(pos{i}(j+1,2)-pos{i}(j,2))^2);
+        r_expm(k) = r_new*pixelSize;
+        k=k+1;
+    end
+end
 
-%% Form estimate of D for slowest 10% of trajectories and the fastest 10% of trajectories
+for i = 1:numel(coord) %loop through every track
+    for j = 1:(length(coord{i})/8) %loop through every position
+        stdev_new = 0;
+        stdev_pool(s) = pixelSize*coord{i}(8*j-3);
+        stdev_pool(s+1) = pixelSize*coord{i}(8*j-2);
+        s=s+2;
+    end
+end
 
+mean_stdev = mean(stdev_pool);
 
-%% Estimate D for single state (249-rif)

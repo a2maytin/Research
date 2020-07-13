@@ -1,4 +1,4 @@
-function [rne,tt,params] = rand_diff_3D_SphCyl(params)
+function [rne,params] = rand_diff_3D_SphCyl(params)
 % To simulate 3D dynamics of RNaseE in 249 and 249-rif
 % This is a simplified version of the code used in the paper
 % Surovtsev et al. PNAS 2016 113 E7266 
@@ -30,7 +30,6 @@ function [rne,tt,params] = rand_diff_3D_SphCyl(params)
 %
 % OUTPUT:
 %   rne - measured coordinates of RNaseE vs time, i-th row is a snap shot of coordinates of all RNaseE (X1,Y1, Z1, X2,Y2, Z2 ...) at a given time,(i-1)*dt_out 
-%   tt - simulation time
 %   params - parameters used for simulation, also contain versio/date info
 %   
 % Andrew Maytin
