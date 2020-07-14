@@ -51,7 +51,7 @@ gof42 = 0;
 gof4m = 0;
 tries = 10;
 
-limit = .8;
+limit = 1;
 dr = 0.01;
 edges = [0:dr:limit];
 D=[.077,.2,.43,1.65];

@@ -60,7 +60,7 @@ loc=params.loc;
 avg=params.avg;
 sigma=params.sigma; % dynamic localization error
 boundary= params.boundary;
-reflective = params.reflective;
+
 
 %% INTIALIZATION
 rng('shuffle'); % to randomly reset RND-generator and change generator method from default
@@ -127,7 +127,7 @@ for tt1=dt_out:dt_out:t_fin % "save cycle", save data at each step
        zB_new=z_R+Dpool(1,ddB+2*totR+1:ddB+3*totR);
        if boundary
        % apply reflecting boundaries
-       [x_R,y_R,z_R] = apply_boundaries(xB_new,yB_new,zB_new,reflective);
+       [x_R,y_R,z_R] = apply_boundaries(xB_new,yB_new,zB_new);
        else
        x_R=xB_new;
        y_R=yB_new;
@@ -244,7 +244,7 @@ end
 
 
 %^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-function [x_new,y_new,z_new] = apply_boundaries(x,y,z,reflective)  
+function [x_new,y_new,z_new] = apply_boundaries(x,y,z)  
 % applies reflective boundaries shaped as spherocylinder with cylinder length Lcyl and cylinder and caps radious Rcyl
    x_new=x;
    y_new=y;
@@ -253,12 +253,10 @@ function [x_new,y_new,z_new] = apply_boundaries(x,y,z,reflective)
   xL=abs(x)-Lcyl0;
   r_old=sqrt((xL>0).*xL.^2+y.^2+z.^2); % if x is in spherical cap, calculate distance from center of sphere
                                        % if x is in cylinder, calculate distance from centerline of cylinder                                                                      
-  ind=(r_old>Rcyl);  
+  ind=(r_old>Rcyl);
   if reflective
   r_new=2*Rcyl-r_old(ind);
-  else
-  r_new=Rcyl; 
-  end  
+  en
   x_new(ind)=(xL(ind)>0).*sign(x(ind)).*(Lcyl0+xL(ind).*r_new./r_old(ind)) + (xL(ind)<=0).*x(ind);
   y_new(ind)=y(ind).*r_new./r_old(ind);
   z_new(ind)=z(ind).*r_new./r_old(ind);

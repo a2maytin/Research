@@ -1,6 +1,6 @@
-function r = ssd(Dsim)  
+function r = ssd(Dsim,simfac)  
 % calculates single step displacements from simulated trajectories
-steps = 7;
+steps = 7*simfac;
 msteps = 100;
 tausim = 0.021742;
 sigma = 0.04;
@@ -9,11 +9,11 @@ totR = 7*907;
 params1.dt=tausim/msteps;  
 params1.dt_out=tausim; %time between each frame (exposure time) in s
 params1.t_fin=tausim*steps; 
-params1.avg = false;
+params1.avg = true;
 params1.totR = totR;
-params1.loc = false;
+params1.loc = true;
 params1.sigma = sigma;
-params1.boundary = false;
+params1.boundary = true;
 
 r=ones(length(Dsim),steps*totR);  %array will store simulated displacements
 
