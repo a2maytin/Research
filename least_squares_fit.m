@@ -74,10 +74,9 @@ close all
 % b2 = bar(counts_mod2)
 
 %^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-Dslow = (0.11:0.01:0.12);
-Dfast = (0.99:0.01:1.01);
-fslow = (0.7:0.1:0.8);
-
+Dslow = (0.11:0.01:0.11);
+Dfast = (0.85:0.01:0.95);
+fslow = (0.8:0.1:0.8);
 
 chisq_array = zeros([length(Dslow),length(Dfast),length(fslow)]);
 std_array = zeros([length(Dslow),length(Dfast),length(fslow)]);
@@ -88,7 +87,7 @@ for n = 1:length(Dslow)
         for f = 1:length(fslow)
             clc
             nsim=1; %factor to make simulated data more precise
-            tries = 20;
+            tries = 100;
             fprintf('\nFitting distribution for Dslow=%.2f, Dfast=%.2f, fslow=%.1f',Dslow(n),Dfast(m),fslow(f));
             fprintf('\nAveraging goodness of fit between exp data and %d simulations, \nCurrently on simulation:  ',tries);
             
@@ -121,14 +120,16 @@ for n = 1:length(Dslow)
 end
 
 
+disp(chisq_array);
+disp(std_array);
 
-%%
-figure
-b1 = bar(counts_exp);
-hold on
-b2 = bar(counts_sim2, 'FaceAlpha', 0.5);
-figure
-b3 = bar((counts_exp-counts_sim2)./sqrt(counts_exp));
+% figure
+% b1 = bar(counts_exp);
+% hold on
+% b2 = bar(counts_sim2, 'FaceAlpha', 0.5);
+% figure
+% b3 = bar((counts_exp-counts_sim2)./sqrt(counts_exp));
+
 
 
 

@@ -129,7 +129,8 @@ params1.dt_out=tausim; %time between each frame (exposure time) in s
 params1.t_fin=tausim*steps; 
 params1.totR=1000;
 params1.D=Dsim; %in um^s/s
-[rne,tt,params]=random_diffusion_3D_SphCyl(params1);
+params1.boundary = false;
+[rne,params]=rand_diff_3D_SphCyl(params1);
 N=params.totR; 
 dT=params.dt_out;
 
@@ -159,24 +160,31 @@ ma.msd;
 %ma.plotMSD;
 
 figure
-ma.plotMeanMSDandrew(gca, true)
-
-[fo, gof] = ma.fitMeanMSD;
+ma.plotMeanMSD(gca)
+[fo, gof] = ma.fitMeanMSD(2);
+hold on
 plot(fo)
-ma.labelPlotMSDandrew;
+
+mmsd = ma.getMeanMSD;
+t = mmsd(:,1);
+x = mmsd(:,2);
+dx = mmsd(:,3) ./ sqrt(mmsd(:,4));
+errorbar(t, x, dx, 'k')
+
+ma.labelPlotMSD;
 legend off
-title('MSD Fit: Simulation w/ localization error and averaging microsteps')
-
-ma = ma.fitMSDandrew;
-
-good_enough_fit = ma.lfit.r2fit > 0.8;
-Dval=ma.lfit.a;
-Dmean = mean( ma.lfit.a(good_enough_fit) ) / 2 / ma.n_dim;
-Dstd  =  std( ma.lfit.a(good_enough_fit) ) / 2 / ma.n_dim;
-
-fprintf('Estimation of the diffusion coefficient from linear fit of the MSD curves:\n')
-fprintf('D = %.3g ± %.3g (mean ± std, N = %d)\n', ...
-    Dmean, Dstd, sum(good_enough_fit));
+title('MSD Fit: Simulation w/o Boundary (Brownian)')
+% 
+% ma = ma.fitMSDandrew;
+% 
+% good_enough_fit = ma.lfit.r2fit > 0.8;
+% Dval=ma.lfit.a;
+% Dmean = mean( ma.lfit.a(good_enough_fit) ) / 2 / ma.n_dim;
+% Dstd  =  std( ma.lfit.a(good_enough_fit) ) / 2 / ma.n_dim;
+% 
+% fprintf('Estimation of the diffusion coefficient from linear fit of the MSD curves:\n')
+% fprintf('D = %.3g ± %.3g (mean ± std, N = %d)\n', ...
+%     Dmean, Dstd, sum(good_enough_fit));
 
 
 %% Example from author
