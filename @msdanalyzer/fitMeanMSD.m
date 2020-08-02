@@ -35,14 +35,15 @@ w = 1./mmsd(:,3);
 if clip_factor < 1
     t_limit = 2 : round(numel(t) * clip_factor);
 else
-    t_limit = 1 : min(1+round(clip_factor), numel(t)); %Note: I changed 2 to 1
+    t_limit = 2 : min(1+round(clip_factor), numel(t)); %Note: I changed 2 to 1 back to 2
 end
 t = t(t_limit);
 y = y(t_limit);
 w = w(t_limit);
+w = ones([1,length(w)]);  %Note: I got rid of weights
 
-%[fo, gof] = fit(t, y, ft, 'Weights', w); 
-[fo, gof] = fit(t, y, ft); %Note: I got rid of weights
+[fo, gof] = fit(t, y, ft, 'Weights', w); 
+%[fo, gof] = fit(t, y, ft);
 
 str = sprintf([
     'Estimating D through linear fit of the weighted EATA MSD curve (first two delays).\n', ...

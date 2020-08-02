@@ -40,40 +40,107 @@ end
 % 4 states
 Dbest = [0.030922	0.095971	0.25078	 1.1491]; %vbSPT			
 fbest = [0.10211	0.43707	0.39841	0.062407];
-Dbest = [0.041,0.131,0.287,0.731];	%limit 0.5, 100 tries -->> 2.1059 +/-0.3807(/100)
-fbest = [0.102,0.532,0.272,0.094];
-Dbest = [0.041,0.130,0.275,0.680];	%limit 0.8, error min(1,sqrt(exp))
-fbest = [0.101,0.523,0.268,0.108];  %------>> 1.8244 +/- 0.2718(/100)
+Dbest =[0.031,0.101,0.223,0.667]; 
+fbest=[0.054,0.390,0.431,0.125]; %.9561
 
-dl1 = 0.001;
-dl = 0;
-D1 = (Dbest(1)-dl1-dl1-dl1:dl1:Dbest(1)-dl1);
-D2 = (Dbest(2)-dl:dl1:Dbest(2)+dl);
-D3 = (Dbest(3)-dl:dl1:Dbest(3)+dl);
-D4 = (Dbest(4)-dl:dl1:Dbest(4)+dl);
-f1 = (fbest(1)-dl:dl1:fbest(1)+dl);
-f2 = (fbest(2)-dl:dl1:fbest(2)+dl);
-f3 = (fbest(3)-dl:dl1:fbest(3)+dl);
+Dbest=[0.038,0.110,0.225,0.663]; %limit 0.5
+fbest=[0.082,0.389,0.402,0.127]; %.9551
+
+Dbest=[0.038,0.110,0.225,0.654]; %limit 0.8, max(1,sqrt(n)) error
+fbest=[0.082,0.390,0.400,0.128]; %.9673
+
+D1b = Dbest(1);
+D2b = Dbest(2);
+D3b = Dbest(3);
+D4b = Dbest(4);
+f1b = fbest(1);
+f2b = fbest(2);
+f3b = fbest(3);
+
+idx = [1, 1, 1, 1, 1, 1, 1, 1, 1];
 %%
 close all
 
-params.boundary = false;
+%params.boundary = true;
 
-
-limit = .8;
+limit = 1;
 dr = 0.01;
 edges = (0:dr:limit);
 counts_exp = histcounts(exp, edges);
+dl = 0.001;
+		
+%^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-% params.boundary = true;
-% params.loc = true;
-% params.avg = true;
+if idx(1) == 1
+    D1b = D1b - dl;
+elseif idx(1) == 2
+    D1b = D1b;    
+else
+    D1b = D1b + dl;        
+end
+%^^^^^^^^^^^^^^^^^^^^^^^^
+if idx(2) == 1
+    D2b = D2b - dl;
+elseif idx(2) == 2
+    D2b = D2b;    
+else
+    D2b = D2b + dl;        
+end
+%^^^^^^^^^^^^^^^^^^^^^^^^
+if idx(3) == 1
+    D3b = D3b - dl;
+elseif idx(3) == 2
+    D3b = D3b;    
+else
+    D3b = D3b + dl;        
+end
+%^^^^^^^^^^^^^^^^^^^^^^^^
+if idx(4) == 1
+    D4b = D4b - 1*dl;
+elseif idx(4) == 2
+    D4b = D4b;    
+else
+    D4b = D4b + 1*dl;        
+end
+%^^^^^^^^^^^^^^^^^^^^^^^^
+if idx(5) == 1
+    f1b = f1b - dl;
+elseif idx(5) == 2
+    f1b = f1b;    
+else
+    f1b = f1b + dl;        
+end
+%^^^^^^^^^^^^^^^^^^^^^^^^
+if idx(6) == 1
+    f2b = f2b - dl;
+elseif idx(6) == 2
+    f2b = f2b;    
+else
+    f2b = f2b + dl;        
+end
+%^^^^^^^^^^^^^^^^^^^^^^^^
+if idx(7) == 1
+    f3b = f3b - dl;
+elseif idx(7) == 2
+    f3b = f3b;    
+else
+    f3b = f3b + dl;        
+end
 
+%
+D1 = (D1b-dl:dl:D1b+dl);
+D2 = (D2b-dl:dl:D2b+dl);
+D3 = (D3b-dl:dl:D3b+dl);
+D4 = (D4b-dl:dl:D4b+dl);
+f1 = (f1b-dl:dl:f1b+dl);
+f2 = (f2b-dl:dl:f2b+dl);
+f3 = (f3b-dl:dl:f3b+dl);
 
 chisq_array = zeros([length(D1),length(D2),length(D3),length(D4),length(f1),length(f2),length(f3)]);
-std_array = zeros([length(D1),length(D2),length(D3),length(D4),length(f1),length(f2),length(f3)]);
 %^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+fitnum = 0;
+z=0;
 
 for n = 1:length(D4)
 for m = 1:length(D3)
@@ -84,36 +151,20 @@ for b = 1:length(f2)
 for a = 1:length(f1)
 clc
 nsim=1; %factor to make simulated data more precise
-tries = 100;
+tries = 1;
 f4 = 1-f1(a)-f2(b)-f3(c);
-fprintf('\nFitting distribution for D=[%.3f,%.3f,%.3f,%.3f], f=[%.3f,%.3f,%.3f,%.3f]', ...
+fprintf('Fitting distribution for D=[%.3f,%.3f,%.3f,%.3f], f=[%.3f,%.3f,%.3f,%.3f]\n\n', ...
         D1(k),D2(l),D3(m),D4(n),f1(a),f2(b),f3(c),f4);
-fprintf('\nAveraging goodness of fit between exp data and %d simulations, \nCurrently on simulation:  ',tries);
 
-gof2array = zeros([1, tries]);
-for j = 1:tries
-
-    Dsim=[D1(k),D2(l),D3(m),D4(n)];
-    fsim=[f1(a),f2(b),f3(c),f4];
-    sim4 = ssd(Dsim, nsim,params);
-    counts_sim4 = 0;
-    for i = 1:4
-        binlim = nsim*round(17974*fsim(i));
-        counti = 1/nsim*histcounts(sim4(i,1:binlim), edges);
-        counts_sim4 = counts_sim4 + counti;     
-    end
-
-    gof2array(j) = chi_squared(counts_exp, counts_sim4);
-
-    if j>10
-    fprintf('\b');
-    end
-    fprintf('\b%d', j);
-
-end
-chisq_array(k,l,m,n,a,b,c) = mean(gof2array);
-std_array(k,l,m,n,a,b,c) = std(gof2array);
-fprintf('  ... Done.\n');
+Dsim=[D1(k),D2(l),D3(m),D4(n)];
+fsim=[f1(a),f2(b),f3(c),f4];
+counts_best = counts_model(Dsim,fsim,limit)*17974;
+chisq_array(k,l,m,n,a,b,c) = chi_squared(counts_exp, counts_best);
+fitnum = fitnum + 1;
+fprintf(repmat('\b',1,z));
+msg = num2str(fitnum);
+fprintf(msg);
+z=numel(msg);
 end
 end
 end
@@ -122,9 +173,8 @@ end
 end
 end
 
-
-disp(chisq_array);
-disp(std_array);
+fprintf('\n');
+%disp(chisq_array);
 
 figure
 b1 = bar(counts_exp, 'FaceAlpha', 0.5);
@@ -134,23 +184,16 @@ b4 = bar(counts_best, 'FaceAlpha', 0.5);
 title('exp vs model')
 
 figure
-b1 = bar(counts_exp, 'FaceAlpha', 0.5);
-hold on
-b2 = bar(counts_sim4, 'FaceAlpha', 0.5);
-title('exp vs sim')
-
-figure
 b3 = bar((counts_exp-counts_best)./sqrt(counts_exp));
 title('model residuals');
 
 gofmodel = chi_squared(counts_exp,counts_best);
 
-figure
-b4 = bar((counts_exp-counts_sim4)./sqrt(counts_exp));
-title('simulation residuals');
-
-
-
+[v, linIdx] = min(chisq_array(:));
+[idxC{1:ndims(chisq_array)}] = ind2sub(size(chisq_array),linIdx);
+idx = cell2mat(idxC);
+disp(v)
+disp(idx)
 %^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 function chisq = chi_squared(exp,sim)  
 % calculates chi squared fit to experimental data

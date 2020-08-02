@@ -37,64 +37,36 @@ for i = 1:numel(pos) %loop through every track
     end
 end
 
-idx = 1;
-%%
+
 close all
 
 %params.boundary = true;
 
-limit = .85;
+limit = .8;
 dr = 0.01;
 edges = (0:dr:limit);
 counts_exp = histcounts(exp, edges);
-dl = 0.005;
-
-% 2 states
+dl = 0.001;
+%
+% 1 state
 Dbest = 0.2;
 fbest = 1;
 
 %^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-% BEST: 5.9742
-D1b = 0.171;
+% BEST: 36.219/2869.4302
+D1b = 0.171;  %.171 +/- .002
+D1b = 0.170;
+
 %%
 
-if idx(1) == 1
-    D1b = D1b - dl;
-elseif idx(1) == 2
-    D1b = D1b;    
-else
-    D1b = D1b + dl;        
-end
-
-
 %
-D1 = (D1b-dl:dl:D1b+dl);
 
 
-chisq_array = zeros(1,length(D1));
-%^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-fitnum = 0;
-z=0;
-
-
-for k = 1:length(D1)
-clc
-nsim=1; %factor to make simulated data more precise
-tries = 1;
-f1 = 1;
-fprintf('Fitting distribution for D=[%.2f]', D1(k));
-
-Dsim=[D1(k)];
-fsim=[f1];
+Dsim=[D1b];
+fsim=[1];
 counts_best = counts_model(Dsim,fsim,limit)*44443;
-chisq_array(k) = chi_squared(counts_exp, counts_best);
-fitnum = fitnum + 1;
-fprintf(repmat('\b',1,z));
-msg = num2str(fitnum);
-fprintf(msg);
-z=numel(msg);
-end
+chisq_array = chi_squared(counts_exp, counts_best);
+
 
 
 fprintf('\n');
@@ -103,20 +75,20 @@ fprintf('\n');
 % figure
 % b1 = bar(counts_exp, 'FaceAlpha', 0.5);
 % hold on
-% counts_best = counts_model(Dbest,fbest,limit)*44443;
+% counts_best = counts_model(Dbest,fbest,limit)*17974;
 % b4 = bar(counts_best, 'FaceAlpha', 0.5);
 % title('exp vs model')
 % 
 % figure
 % b3 = bar((counts_exp-counts_best)./sqrt(counts_exp));
 % title('model residuals');
-
-gofmodel = chi_squared(counts_exp,counts_best);
+% 
+% gofmodel = chi_squared(counts_exp,counts_best);
 
 [v, linIdx] = min(chisq_array(:));
 [idxC{1:ndims(chisq_array)}] = ind2sub(size(chisq_array),linIdx);
 idx = linIdx;
-disp(v)
+disp(v-2000)
 disp(idx)
 %^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 function chisq = chi_squared(exp,sim)  
@@ -130,7 +102,8 @@ pulls = residuals./errors;
 %h3 = histogram(pulls)
 
 chisq = sum(pulls.*pulls);
-chisq = chisq/(length(exp)-1); %chisq per dof
+chisq = sum(pulls.*pulls); %chisq, not per dof
+%chisq = chisq/(length(exp)-1); %chisq per dof
 end
 %^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 function counts = counts_model(D, f, limit)

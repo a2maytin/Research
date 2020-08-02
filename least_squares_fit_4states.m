@@ -42,24 +42,19 @@ close all
 params.boundary = false;
 
 
-limit = .8;
+limit = .85;
 dr = 0.01;
 edges = (0:dr:limit);
 counts_exp = histcounts(exp, edges);
 
-Dbest = [0.07657,	0.20044,	0.4329,	    1.6469];
-fbest = [0.31061,	0.52968,	0.12276,	0.036953];
-
-%best brownian
-Dbound = [0.073,	0.197,	0.509,	2.378];
-fbound = [0.318,	0.528,	0.135,	0.019];
-Dbest = Dbound;
-fbest = fbound;
+Dbest = [.077 .208 .50 1.8];
+fbest = [.35 .51 .12 .02];
 
 params.boundary = true;
 params.loc = true;
 params.avg = true;
-Dbound = D_to_Dsim([0.073,	0.197,	0.509,	2.378]);
+Dbound = D_to_Dsim(Dbest);
+fbound = fbest;
 
 
 %^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -80,10 +75,10 @@ Dbound = D_to_Dsim([0.073,	0.197,	0.509,	2.378]);
 % f2 = fbest(2);
 % f3 = fbest(3);
 
-D1 = D_to_Dsim((.073:.001:.073));
+D1 = D_to_Dsim((.077:.001:.077));
 D2 = Dbound(2);
 D3 = Dbound(3);
-D4 = Dbound(4);
+D4 = D_to_Dsim((1.9:.1:2.2));
 f1 = fbound(1);
 f2 = fbound(2);
 f3 = fbound(3);
@@ -102,9 +97,9 @@ for b = 1:length(f2)
 for a = 1:length(f1)
 clc
 nsim=1; %factor to make simulated data more precise
-tries = 10;
+tries = 20;
 f4 = 1-f1(a)-f2(b)-f3(c);
-fprintf('\nFitting distribution for D=[%.2f,%.2f,%.2f,%.2f], f=[%.2f,%.2f,%.2f,%.2f]', ...
+fprintf('\nFitting distribution for D=[%.4f,%.4f,%.4f,%.4f], f=[%.4f,%.4f,%.4f,%.4f]', ...
         D1(k),D2(l),D3(m),D4(n),f1(a),f2(b),f3(c),f4);
 fprintf('\nAveraging goodness of fit between exp data and %d simulations, \nCurrently on simulation:  ',tries);
 
@@ -162,7 +157,7 @@ xlabel('Bin number = t/.021742')
 ylabel('Counts')
 
 figure
-b3 = bar((counts_exp-counts_best)./sqrt(counts_exp));
+b3 = bar((counts_exp-counts_best)./max(1,sqrt(counts_exp)));
 title('4-state brownian model residuals');
 xlabel('Bin number = t/.021742')
 ylabel('Normalized Residuals')
@@ -170,7 +165,7 @@ ylabel('Normalized Residuals')
 gofmodel = chi_squared(counts_exp,counts_best);
 
 figure
-b4 = bar((counts_exp-counts_sim4)./sqrt(counts_exp));
+b4 = bar((counts_exp-counts_sim4)./max(1,sqrt(counts_exp)));
 title('4-state sim residuals');
 xlabel('Bin number = t/.021742')
 ylabel('Normalized Residuals')
@@ -181,7 +176,7 @@ function chisq = chi_squared(exp,sim)
 % calculates chi squared fit to experimental data
 residuals = exp-sim;
 % assume Poisson statistics
-errors = sqrt(exp);
+errors = max(1,sqrt(exp));
 %errors = 20*ones(1,length(exp));
 pulls = residuals./errors;
 %figure

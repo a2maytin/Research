@@ -3,7 +3,7 @@ function r = ssd(Dsim,simfac,params1)
 steps = 8*simfac; %<<<<<<< I MADE 7*simfac INTO 8*simfac HERE <<<<<<
 msteps = 100;
 tausim = 0.021742;
-sigma = 0.04;
+sigma = 0.023;
 totR = 7*907;
 
 params1.dt=tausim/msteps;  

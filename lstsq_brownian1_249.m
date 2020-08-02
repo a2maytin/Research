@@ -14,7 +14,7 @@ close all
 % whenever the value of chi2 exceeds 2
 
 % Import the measured trajectories
-file = load('SK249-rif_tracksFinal.mat');
+file = load('SK249_tracksFinal.mat');
 traj = file.tracksFinal;
 coord = {traj.tracksCoordAmpCG};
 
@@ -43,21 +43,21 @@ close all
 
 %params.boundary = true;
 
-limit = .85;
+limit = .5;
 dr = 0.01;
 edges = (0:dr:limit);
 counts_exp = histcounts(exp, edges);
-dl = 0.005;
-
-% 2 states
+dl = 0.001;
+%
+% 1 state
 Dbest = 0.2;
 fbest = 1;
 
 %^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-% BEST: 5.9742
-D1b = 0.171;
-%%
+% BEST: 23.1874
+D1b = 0.173;
 
+%%
 if idx(1) == 1
     D1b = D1b - dl;
 elseif idx(1) == 2
@@ -87,7 +87,7 @@ fprintf('Fitting distribution for D=[%.2f]', D1(k));
 
 Dsim=[D1(k)];
 fsim=[f1];
-counts_best = counts_model(Dsim,fsim,limit)*44443;
+counts_best = counts_model(Dsim,fsim,limit)*17974;
 chisq_array(k) = chi_squared(counts_exp, counts_best);
 fitnum = fitnum + 1;
 fprintf(repmat('\b',1,z));
@@ -100,18 +100,18 @@ end
 fprintf('\n');
 % disp(chisq_array);
 % 
-% figure
-% b1 = bar(counts_exp, 'FaceAlpha', 0.5);
-% hold on
-% counts_best = counts_model(Dbest,fbest,limit)*44443;
-% b4 = bar(counts_best, 'FaceAlpha', 0.5);
-% title('exp vs model')
-% 
-% figure
-% b3 = bar((counts_exp-counts_best)./sqrt(counts_exp));
-% title('model residuals');
+figure
+b1 = bar(counts_exp, 'FaceAlpha', 0.5);
+hold on
+counts_best = counts_model(Dbest,fbest,limit)*17974;
+b4 = bar(counts_best, 'FaceAlpha', 0.5);
+title('exp vs model')
 
-gofmodel = chi_squared(counts_exp,counts_best);
+figure
+b3 = bar((counts_exp-counts_best)./sqrt(counts_exp));
+title('model residuals');
+% 
+% gofmodel = chi_squared(counts_exp,counts_best);
 
 [v, linIdx] = min(chisq_array(:));
 [idxC{1:ndims(chisq_array)}] = ind2sub(size(chisq_array),linIdx);
@@ -129,8 +129,8 @@ pulls = residuals./errors;
 %figure
 %h3 = histogram(pulls)
 
-chisq = sum(pulls.*pulls);
-chisq = chisq/(length(exp)-1); %chisq per dof
+chisq = sum(pulls.*pulls); %chisq, not per dof
+%chisq = chisq/(length(exp)-1); %chisq per dof
 end
 %^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 function counts = counts_model(D, f, limit)

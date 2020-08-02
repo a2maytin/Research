@@ -1,20 +1,23 @@
 close all
 clc
-limit = 0.4;
+limit = 0.8;
 dr = 0.01;
 edges = (0:dr:limit);
 %counts_exp = histcounts(exp, edges);
 
-% D = D_to_Dsim([Dtry, Dtry]);
-D = [2,2];
+
+Dm = [.1,.1];
+D = D_to_Dsim(Dm);
+
+
 nsim = 1;
 
 binlim =0.8;
 
 params.boundary = true;
 %params.boundary = false;
-% params.avg = true;
-% params.loc = true;
+params.avg = true;
+params.loc = true;
 
 sim_b = ssd(D, nsim, params);
 
@@ -25,8 +28,6 @@ counts_b2 = histcounts(sim_b(2,:), edges);
 
 counts_free = histcounts(ssd(D,nsim),edges);
 
-Dm = [1.55, 1.55];
-correction = [0.0,0.0];
 
 
 figure
@@ -35,13 +36,15 @@ hold on
 b2 = bar(counts_b2, 'FaceAlpha', 0.5);
 %b3 = bar(counts_free, 'FaceAlpha', 0.5);
 %p = plot(counts_model(D,1,limit, 44443*nsim));
-counts_mod1 = counts_model(Dm(1)-correction(1),1,limit, 44443*nsim);
-counts_mod2 = counts_model(Dm(2)-correction(2),1,limit, 44443*nsim);
+counts_mod1 = counts_model(Dm(1),1,limit, 44443*nsim);
+counts_mod2 = counts_model(Dm(2),1,limit, 44443*nsim);
 p1 = plot(counts_mod1);
 p2 = plot(counts_mod2);
 
 figure
 b4 = bar((counts_mod1-counts_b1)./sqrt(counts_mod1));
+hold on
+b5 = bar((counts_mod2-counts_b2)./sqrt(counts_mod2));
 
 disp(chi_squared(counts_mod1,counts_b1))
 disp(chi_squared(counts_mod2,counts_b2))

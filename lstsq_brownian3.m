@@ -43,7 +43,7 @@ close all
 
 %params.boundary = true;
 
-limit = .8;
+limit = .85;
 dr = 0.01;
 edges = (0:dr:limit);
 counts_exp = histcounts(exp, edges);
@@ -55,13 +55,17 @@ Dbest = [0.088133,	0.24593,	1.3271];
 fbest = [0.41606,	0.52508,	0.058861];
 
 %^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-%BEST: 
-D1b = 0.085;
-D2b = 0.264;
-D3b = 1.352;
-f1b = 0.448;
-f2b = 0.508;
+%BEST:  121.7988
 
+D=[0.088,0.271,1.346], f=[0.471,0.486,0.043]
+
+D1b = 0.088;
+D2b = 0.271;
+D3b = 1.346;
+f1b = 0.471;
+f2b = 0.486;
+
+%%
 if idx(1) == 1
     D1b = D1b - dl;
 elseif idx(1) == 2
@@ -165,19 +169,24 @@ gofmodel = chi_squared(counts_exp,counts_best);
 idx = cell2mat(idxC);
 disp(v)
 disp(idx)
+
+f3 = 1- f1(idx(4))- f2(idx(5));
+fprintf('Best was D=[%.3f,%.3f,%.3f], f=[%.3f,%.3f,%.3f]\n\n', ...
+        D1(idx(1)),D2(idx(2)),D3(idx(3)),...
+        f1(idx(4)),f2(idx(5)),f3);
 %^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 function chisq = chi_squared(exp,sim)  
 % calculates chi squared fit to experimental data
 residuals = exp-sim;
 % assume Poisson statistics
-errors = sqrt(exp);
+errors = max(1,sqrt(exp));
 %errors = 20*ones(1,length(exp));
 pulls = residuals./errors;
 %figure
 %h3 = histogram(pulls)
 
 chisq = sum(pulls.*pulls);
-chisq = chisq/(length(exp)-1); %chisq per dof
+%chisq = chisq/(length(exp)-1); %chisq per dof
 end
 %^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 function counts = counts_model(D, f, limit)

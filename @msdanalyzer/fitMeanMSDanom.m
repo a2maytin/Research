@@ -1,9 +1,8 @@
-function  varargout = fitMeanMSD(obj, clip_factor)
-%%FITMEANMSD Fit the weighted averaged MSD by a linear function.
+function  varargout = fitMeanMSDanom(obj, clip_factor,x1,x3)
+%%FITMEANMSDANOM Fit the weighted averaged MSD by a nonlinear function.
 %
-% obj.fitMeanMSD computes and fits the weighted mean MSD by a
-% straight line y = a * x. The fit is therefore valid only for
-% purely diffusive behavior. Fit results are displayed in the
+% obj.fitMeanMSDanom computes and fits the weighted mean MSD by a
+% nonlinear function. Fit results are displayed in the
 % command window.
 %
 % obj.fitMeanMSD(clip_factor) does the fit, taking into account
@@ -40,19 +39,29 @@ end
 t = t(t_limit);
 y = y(t_limit);
 w = w(t_limit);
+w = ones([1,length(w)]);  %Note: I got rid of weights
 
-%[fo, gof] = fit(t, y, ft, 'Weights', w); 
-[fo, gof] = fit(t, y, ft); %Note: I got rid of weights
+%^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[fo, gof] = fit(t, y, ft, 'Weights', w); 
+%[fo, gof] = fit(t, y, ft);
+
+fun = @(r)(r(1)*t.^r(2)+r(3))-y;
+x0 = [x1,1,x3];
+x = lsqnonlin(fun,x0);
+%^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 str = sprintf([
-    'Estimating D through linear fit of the EATA MSD curve (first two delays).\n', ...
-    'D = %.3e'], fo.p1/2/obj.n_dim);
+    'Estimating D through nonlinear fit of the weighted EATA MSD curve (first two delays).\n', ...
+    'D = %.3e'], x(1)/2/obj.n_dim);
 disp(str)
 
 if nargout > 0
     varargout{1} = fo;
     if nargout > 1
         varargout{2} = gof;
+        if nargout > 2
+            varargout{3} = x;
+        end
     end
 end
 

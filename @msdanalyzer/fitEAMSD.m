@@ -35,7 +35,7 @@ w = ones(size(y)); %all weighted equally
 if clip_factor < 1
     t_limit = 2 : round(numel(t) * clip_factor);
 else
-    t_limit = 1 : min(1+round(clip_factor), numel(t)); %Note: I changed 2 to 1
+    t_limit = 2 : min(1+round(clip_factor), numel(t)); %Note: I changed 2 to 1 back to 2
 end
 t = t(t_limit);
 y = y(t_limit);
