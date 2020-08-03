@@ -5,20 +5,16 @@ function [rne,params] = rand_diff_3D_SphCyl(params)
 % http://www.pnas.org/content/113/46/E7268.full
 %
 % Simulations organized as a nested loops with "silent" internal loop that run simulations without saving coordinates, 
-%   and external loop in which corrdinates are saved at each iteration.
-% All simulations are within a 3D spherocylinder with reflective boundaries  
+% and external loop in which corrdinates are saved at each iteration.
+% All simulations are within a 3D spherocylinder with reflective boundaries.  
 %
-% 
-% Experimental Version: This version is meant to mimic the measurement
-% process. Therefore the reported moleceule positions after every frame are
+% This simulation is meant to mimic the measurement
+% process. Therefore the reported molecule positions after every frame are
 % taken as the average of all the microstep positions, and dynamic 
 % localization error is modeled as added gaussian noise. In this sense the 
 % reported positions are like the "measured" positions from under a
 % microscope. (params.avg = true, params.loc = true)
 %
-% Theoretical Version (Default): This version is meant to model RNaseE trajectories
-% in 3D cell geometry. The reported postions are the absolute RNaseE 
-% positions at the end of every frame. (params.avg = false, params.loc = false)
 %
 % INPUT:
 %   params - parameters for simulation with multiple fields, for example:
@@ -30,10 +26,13 @@ function [rne,params] = rand_diff_3D_SphCyl(params)
 %
 % OUTPUT:
 %   rne - measured coordinates of RNaseE vs time, i-th row is a snap shot of coordinates of all RNaseE (X1,Y1, Z1, X2,Y2, Z2 ...) at a given time,(i-1)*dt_out 
-%   params - parameters used for simulation, also contain versio/date info
+%   params - parameters used for simulation, also contain version/date info
+%   NOTE: When getting/using data from simulation, discard position at time 
+%   t = 0, because it takes into account neither averaging due to finite camera
+%   exposure nor localization error.
 %   
 % Andrew Maytin
-% 6.8.2020
+% 8.2.2020
 %__________________________________________________________
 %%
 
@@ -50,7 +49,7 @@ function [rne,params] = rand_diff_3D_SphCyl(params)
 dt=params.dt;  % Simulation time step
 dt_out=params.dt_out; % data output time step
 t_fin=params.t_fin; % end time of simulation
- % simulation box parameters
+ % simulation cell parameters
 l0=params.l0;    % cell length
 w0=params.w0;  % cell width
 
@@ -82,13 +81,15 @@ y_R=y_R0;
 z_R=z_R0; 
  
 % making data collectors for the output
-rne=111*ones(floor(t_fin/dt_out)+1,3*totR);         % RNaseE coordinates
+rne=111*ones(floor(t_fin/dt_out)+1,3*totR);  % RNaseE coordinates
 
 % saving initial values - RNaseE coordinates states - at t=0;  
+% NOTE: When getting/using data from simulation, discard position at time 
+% t = 0, because it takes into account neither averaging due to finite camera
+% exposure nor localization error.
 rne(1,1:3:end)=x_R;
 rne(1,2:3:end)=y_R;
 rne(1,3:3:end)=z_R;
-
 
 %% SIMULATION
 
@@ -117,8 +118,6 @@ for tt1=dt_out:dt_out:t_fin % "save cycle", save data at each step
   % ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   for tt2=dt:dt:dt_out % "silent" cycle, move without saving data
       
-    tt=tt1+tt2; % current time
-          
     % ~~~~~ Make BD moves    
  
     % - RNaseE moves
@@ -218,7 +217,7 @@ function params_out = change_parameters(params_in)
  params0.dim=3; % Dimension of simulations;
  params0.script=script; %'random_diffusion_3D_SphCyl';
  params0.model='1-state model';
- params0.version='2020.06.10';
+ params0.version='2020.08.02';
   
  % check what is provided as input parameters, i.e., in 'params_in', and substitute those in default values
  fldnms_in = fieldnames(params_in);

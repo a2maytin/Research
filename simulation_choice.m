@@ -6,11 +6,9 @@ edges = (0:dr:limit);
 %counts_exp = histcounts(exp, edges);
 
 
-Dm = [.1,.1];
-D = D_to_Dsim(Dm);
+Dm = [.075,.075];
+D = D_to_Dsim([.075,.075]);
 
-
-nsim = 1;
 
 binlim =0.8;
 
@@ -19,7 +17,7 @@ params.boundary = true;
 params.avg = true;
 params.loc = true;
 
-sim_b = ssd(D, nsim, params);
+sim_b = ssd(D, 44443, params);
 
 counts_b1 = histcounts(sim_b(1,:), edges);  
 counts_b2 = histcounts(sim_b(2,:), edges);  

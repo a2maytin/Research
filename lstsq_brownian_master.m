@@ -1,5 +1,5 @@
 % Perform least squares fit to experimental data.
-% Find optimal value of the fit parameters D and f.
+% Find optimal values of the fit parameters D and f.
 
 % This code iteratively finds the value of the parameters that minimizes 
 % the sum of square errors. Note: Usually least squares fitting is done 
@@ -15,12 +15,12 @@
 % https://www.phys.hawaii.edu/~varner/PHYS305-Spr12/DataFitting.html
 
 % Import the measured trajectories
-file = load('SK249_tracksFinal.mat');
+file = load('SK249_tracksFinal.mat');  %SK249-rif.tracksFinal.mat
 traj = file.tracksFinal;
 coord = {traj.tracksCoordAmpCG};
 pos = {traj.tracksCoordXY};
 
-% convert units to SI units
+% convert units to SI units, specific to 249/249-rif data for this project
 pixelSize = .16; % in micrometers
 timeStep = 21.742e-3;
 
@@ -36,16 +36,16 @@ for i = 1:numel(pos) %loop through every track
 end
 %% INITIAL GUESS, SET FIXED PARAMETERS
 
-numStates = 4; % Number of states, can be 1-5
+numStates = 5; % Number of states, can be 1-5
 
-limit = .5; % Set the limit for binning to avoid zero count bins
+limit = .8; % Set the limit for binning to avoid zero count bins
 dr = 0.01; % Set the bin width
 dl = 0.001; % parameter increment used during optimization
 maxSteps = 100; % Maximum number of iterations before optimization times out 
 
 % Initial Guess
-D0=[0.038,0.11,0.23,0.66]; 
-f0=[0.08,0.39,0.40]; 
+D0=[.038, .1, .19, .56, 1.6]; 
+f0=[.074, .28, .48, .15]; 
 
 %^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 % dirStep : Descent direction
@@ -144,7 +144,7 @@ dirStep = cell2mat(idxC);
 
 chisq_history(t+1) = chisq_min;
 improvement = chisq_history(t) - chisq_history(t+1);
-
+farray(numStates,1) = 0;
 fN = 1- farray(1,dirStep(6))- farray(2,dirStep(7))- farray(3,dirStep(8))- farray(4,dirStep(9));
 
 % Print smallest chisquared this step
@@ -191,10 +191,10 @@ end
 
 %^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Derror = 1; %Pick parameter to find error bounds
-ferror = 0;
+Derror = 4; %Pick parameter to find error bounds (set to 0 if checking f)
+ferror = 0; %Pick parameter to find error bounds (set to 0 if checking D)
 
-de = 0.015; %Try these error bounds on this parameter
+de = 0.1; %Try these error bounds on this parameter
 minus = true; % True if checking negative error bar and vice versa
 maxStepsError = 10;
 
@@ -302,6 +302,7 @@ dirStep = cell2mat(idxC);
 chisq_history(t+1) = chisq_min;
 improvement = chisq_history(t) - chisq_history(t+1);
 
+farray(numStates,1) = 0;
 fN = 1- farray(1,dirStep(6))- farray(2,dirStep(7))- farray(3,dirStep(8))- farray(4,dirStep(9));
 
 % Print smallest chisquared this step
@@ -325,16 +326,16 @@ end
 
 end
 %^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-if abs(chisq_min - chisq_best) < .9
+if abs(chisq_min - chisq_best) < .7
     fprintf('The error bar of %.3f is too low, try larger error bar',de)
-elseif abs(chisq_min - chisq_best) > .9 && abs(chisq_min - chisq_best) < 1
-    fprintf('The error bar of %.3f may be slightly too low, because it yields a chi-squared %.2f higher than best fit',de,abs(chisq_min - chisq_best))
+elseif abs(chisq_min - chisq_best) > .7 && abs(chisq_min - chisq_best) < 1
+    fprintf('The error bar of %.3f may be slightly too low,\nbecause it yields a chi-squared %.2f higher than best fit',de,abs(chisq_min - chisq_best))
 elseif minimum_reached == true && abs(chisq_min - chisq_best) > 2
     fprintf('The error bar of %.3f is too high, try smaller error bar',de) 
 elseif minimum_reached == true && abs(chisq_min - chisq_best) > 1.1 && abs(chisq_min - chisq_best) < 2
-    fprintf('The error bar of %.3f may be a slightly high estimate, because it yields a chi-squared %.2f higher than best fit',de,abs(chisq_min - chisq_best)) 
+    fprintf('The error bar of %.3f may be a slightly high estimate,\nbecause it yields a chi-squared %.2f higher than best fit',de,abs(chisq_min - chisq_best)) 
 elseif minimum_reached == true && abs(chisq_min - chisq_best) > 1 && abs(chisq_min - chisq_best) < 1.1
-    fprintf('The error bar of %.3f is a great estimate, because it yields a chi-squared %.2f higher than best fit',de,abs(chisq_min - chisq_best)) 
+    fprintf('The error bar of %.3f is a great estimate,\nbecause it yields a chi-squared %.2f higher than best fit',de,abs(chisq_min - chisq_best)) 
 elseif minimum_reached == false 
     fprintf('Minimum not reached, run section again or try smaller error bar') 
 end

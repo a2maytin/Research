@@ -1,11 +1,10 @@
-%clear
+% Find the localization error fromn Utrack data structure.
+
 % Import the measured trajectories
 file = load('SK249_tracksFinal.mat');
 traj = file.tracksFinal;
 coord = {traj.tracksCoordAmpCG};
-
 pos = {traj.tracksCoordXY};
-
 % convert units to SI units
 pixelSize = 160e-9; 
 timeStep = 21.742e-3;
