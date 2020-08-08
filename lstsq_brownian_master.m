@@ -8,14 +8,14 @@
 % combinations step size = dl away from the current set of parameters.
 
 % Fit judged poor when chi2 is greater than best fit chi2 by one degree of 
-% freedom. Therefore, the uncertainty in a fit parameter (f) is taken to be 
+% freedom. Therefore, the uncertainty in a fit parameter (p) is taken to be 
 % the deviation (de) in that fit parameter such when that parameter is 
 % fixed at p±de and all other parameters are optimized, results in a chi2 
 % of (bestfit chi2) +1. Source:
 % https://www.phys.hawaii.edu/~varner/PHYS305-Spr12/DataFitting.html
 
 % Import the measured trajectories
-file = load('SK249_tracksFinal.mat');  %SK249-rif.tracksFinal.mat
+file = load('SK249-rif_tracksFinal.mat');  %SK249-rif.tracksFinal.mat
 traj = file.tracksFinal;
 coord = {traj.tracksCoordAmpCG};
 pos = {traj.tracksCoordXY};
@@ -168,11 +168,11 @@ end
 
 end
 %^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-%% INITIAL GUESS PARAMETER ERROR
+%% INITIAL GUESS FOR PARAMETER ERROR
 % To find the error (uncertainty) in parameter p, the smallest variation de 
 % is found such that when p is fixed at p±de and all other parameters are
 % optimized, the best fit chi-squared is >= one more than the
-% best fit chi-squared. 
+% actual best fit chi-squared. 
 
 % For example, for a two (p1,p2) parameter fit, the grid of chi-squared 
 % could looklike this, with best fit chi-squared = 40:

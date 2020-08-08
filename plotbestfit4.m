@@ -1,3 +1,6 @@
+% This script was used to make figures for my presentation and paper
+% Andrew Maytin 8/7/2020
+
 file = load('SK249-rif_tracksFinal.mat');
 traj = file.tracksFinal;
 coord = {traj.tracksCoordAmpCG};
@@ -45,8 +48,8 @@ grid on;
 
 %xlim([0, 0.8]);
 xlabel('Single Step Displacement (um)', 'FontSize', 14);
-ylabel('Bin Count (Normalized)', 'FontSize', 14);
-title('Best 4-state Fit: Analytical (Brownian)','FontSize', 14);
+ylabel('Bin Count', 'FontSize', 14);
+title('Best 4-state Fit to SK249-rif: Analytical (Brownian)','FontSize', 14);
 l1 = legend([b1,p],{'Experiment (N=44443 steps)','Best 4-state Brownian model'});
 l1.FontSize = 16;
 

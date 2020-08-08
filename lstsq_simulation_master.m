@@ -11,7 +11,7 @@
 % experimental data.
 
 % Import the measured trajectories
-file = load('SK249_tracksFinal.mat'); %SK249-rif.tracksFinal.mat
+file = load('SK249-rif_tracksFinal.mat'); %SK249-rif.tracksFinal.mat
 traj = file.tracksFinal;
 coord = {traj.tracksCoordAmpCG};
 pos = {traj.tracksCoordXY};
@@ -33,35 +33,34 @@ for i = 1:numel(pos) %loop through every track
 end
 %% INITIAL GUESS, SET FIXED HISTOGRAM/SIMULATION PARAMETERS
 
-numStates = 2; %Number of states
+numStates = 3; %Number of states
 
-limit = .5; % Set the limit for binning to avoid zero count bins
+limit = .85; % Set the limit for binning to avoid zero count bins
 dr = 0.01; % Set the bin width
 
-nsim = 4; % number of simulations to run for each set of parameters
+nsim = 100; % number of simulations to run for each set of parameters
 
 % To aid with initial guessing, the effect of the boundary, localization 
 % error and averaging was found to lower the apparent D of brownian
 % diffusing particle. D_to_Dsim is designed to take the best brownian fit 
 % parameters as input and calculate what would be a good guess for
 % simulated parameters.
-Ds = [0.11,	0.44];
-D0 = D_to_Dsim([0.11,	0.44]);
-f0 = [0.67,	0.33];
+Ds = [0.088,	0.271, 1.35];
+D0 = D_to_Dsim([0.088,	0.271, 1.35]);
+f0 = [.471, .486, .043];
 
 % Simulation parameters: turn on boundary, localization error, and 
 % averaging due to finite camera exposure
 params.boundary = true;
 params.loc = true;
 params.avg = true;
-
 %^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-D1 = (.13:.01:.15);
-D2 = (.67 :.01 :.69);
-D3 = 0;
+D1 = (.1:.01:.1);
+D2 = (.4 :.01 :.4);
+D3 = (2.4 :.01 : 2.4);
 D4 = 0;
-f1 = (.66 :.01 :.68);
-f2 = 0;
+f1 = (.47 :.01 :.47);
+f2 = (.49 :.01 :.49);
 f3 = 0;
 
 

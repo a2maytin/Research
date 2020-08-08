@@ -6,7 +6,8 @@ function [rne,params] = rand_diff_3D_SphCyl(params)
 %
 % Simulations organized as a nested loops with "silent" internal loop that run simulations without saving coordinates, 
 % and external loop in which corrdinates are saved at each iteration.
-% All simulations are within a 3D spherocylinder with reflective boundaries.  
+% All simulations are within a 3D spherocylinder with reflective or sticky 
+% boundaries (default is reflective).
 %
 % This simulation is meant to mimic the measurement
 % process. Therefore the reported molecule positions after every frame are
@@ -125,7 +126,7 @@ for tt1=dt_out:dt_out:t_fin % "save cycle", save data at each step
        yB_new=y_R+Dpool(1,ddB+totR+1:ddB+2*totR);
        zB_new=z_R+Dpool(1,ddB+2*totR+1:ddB+3*totR);
        if boundary
-       % apply reflecting boundaries
+       % apply reflecting or sticky boundaries (default: reflective)
        [x_R,y_R,z_R] = apply_boundaries(xB_new,yB_new,zB_new,reflective);
        else
        x_R=xB_new;
@@ -196,7 +197,7 @@ function params_out = change_parameters(params_in)
  params0.dt_out=1; % data output time step
  params0.t_fin=10; % end time of simulation
 
- l_0=3.0; w_0=1.1; % cell length and width
+ l_0=3.0; w_0=1.1; % cell tip-to-tip length and cell width
  params0.l0=l_0; %l_0=2.5;    % cell length
  params0.w0=w_0; %w_0=0.5;  % cell width
 
@@ -244,7 +245,7 @@ end
 
 %^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 function [x_new,y_new,z_new] = apply_boundaries(x,y,z,reflective)  
-% applies reflective boundaries shaped as spherocylinder with cylinder length Lcyl and cylinder and caps radious Rcyl
+% applies reflective (or sticky) boundaries shaped as spherocylinder with cylinder length Lcyl and cylinder and caps radious Rcyl
    x_new=x;
    y_new=y;
    z_new=z;
@@ -255,8 +256,8 @@ function [x_new,y_new,z_new] = apply_boundaries(x,y,z,reflective)
   ind=(r_old>Rcyl);  
   if reflective
   r_new=2*Rcyl-r_old(ind);
-  else
-  r_new=Rcyl; 
+  else                                 % if reflective is false, boundary is "sticky": particle position becomes 
+  r_new=Rcyl;                          % stuck to boundary for that microstep.
   end  
   x_new(ind)=(xL(ind)>0).*sign(x(ind)).*(Lcyl0+xL(ind).*r_new./r_old(ind)) + (xL(ind)<=0).*x(ind);
   y_new(ind)=y(ind).*r_new./r_old(ind);

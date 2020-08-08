@@ -23,19 +23,13 @@ counts_b1 = histcounts(sim_b(1,:), edges);
 counts_b2 = histcounts(sim_b(2,:), edges);  
 
 
-
-counts_free = histcounts(ssd(D,nsim),edges);
-
-
-
 figure
 b1 = bar(counts_b1, 'FaceAlpha', 0.5);
 hold on
 b2 = bar(counts_b2, 'FaceAlpha', 0.5);
-%b3 = bar(counts_free, 'FaceAlpha', 0.5);
-%p = plot(counts_model(D,1,limit, 44443*nsim));
-counts_mod1 = counts_model(Dm(1),1,limit, 44443*nsim);
-counts_mod2 = counts_model(Dm(2),1,limit, 44443*nsim);
+
+counts_mod1 = counts_model(Dm(1),1,limit, 44443);
+counts_mod2 = counts_model(Dm(2),1,limit, 44443);
 p1 = plot(counts_mod1);
 p2 = plot(counts_mod2);
 

@@ -15,10 +15,10 @@ function r = ssd(Dsim,N,params1)
 %   averaging due to finite camera exposure nor localization error.
 %__________________________________________________________________________
 
-steps = 8;          %total useful frames+1
+steps = 8;          %total useful frames
 msteps = 100;       %number of microsteps
 tausim = 0.021742;  %time step 
-sigma = 0.023;      %localization error from UTrack data structure 
+sigma = 0.024;      %localization error from UTrack data structure 
 totR = ceil(N/(steps-1));
 
 % set the missing fields 
